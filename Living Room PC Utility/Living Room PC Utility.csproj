@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Living_Room_PC_Utility</RootNamespace>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+<ItemGroup>
+	<None Update="resources\**\*">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+</ItemGroup>
+
+<ItemGroup>
+	<None Update="data\**\*">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+</ItemGroup>
+
+<ItemGroup>
+  <PackageReference Include="ini-parser" Version="2.5.2" />
+  <PackageReference Include="NAudio" Version="2.2.1" />
+  <PackageReference Include="System.Management" Version="9.0.1" />
+</ItemGroup>
+
+</Project>
