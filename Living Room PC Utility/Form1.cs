@@ -1,17 +1,8 @@
-using System;
 using System.Diagnostics;
-using System.Management;
-using System.Linq;
-using System.Windows.Forms;
-using System.Threading;
-using System.Collections.Generic;
 using IniParser;
 using IniParser.Model;
-using System.Reflection.Emit;
-using Microsoft.VisualBasic.Devices;
-using System.Runtime.CompilerServices;
 using NAudio.CoreAudioApi;
-using System.Text;
+using AutoActions.Displays;
 
 
 namespace Living_Room_PC_Utility
@@ -20,9 +11,12 @@ namespace Living_Room_PC_Utility
     {
         private NotifyIcon trayIcon;
         private System.Windows.Forms.Timer processMonitorTimer;
-        private HashSet<string> monitoredProcesses; // To track monitored processes
         private string specialProgram = "";
-        private IniData globalConfigData;
+        private IniData config;
+
+        FileIniDataParser parser = new FileIniDataParser();
+
+        private Dictionary<string, ProgramConfig> programConfigs = new Dictionary<string, ProgramConfig>();
         private string audioDeviceName = "";
 
         public Form1()
@@ -44,42 +38,19 @@ namespace Living_Room_PC_Utility
 
             trayIcon.DoubleClick += new System.EventHandler(IconClick);
 
-            // Initialize the parser
-            var parser = new FileIniDataParser();
-            
-            globalConfigData = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\ProgramConfigListGlobal.ini"));
+            // Build the absolute path to the DLL
+            string dllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources", "dll");
 
-            // label1.Text = data.ToString();
+            // Add the DLL directory to the PATH environment variable at runtime
+            Environment.SetEnvironmentVariable("PATH", $"{dllPath};{Environment.GetEnvironmentVariable("PATH")}");
 
-            foreach (var item in globalConfigData["Audio"])
-            {
-                listBox1.Items.Add(item.KeyName + ": " + item.Value);
-            }
+            this.SetProgramConfigs();
 
+            this.SetDefaultSoundDisplaySettings();
 
+            this.PopulateConfigFields();
 
-            // Initialize the list of programs to monitor
-            monitoredProcesses = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "notepad", // Example program
-                //"chrome",  // Example program
-                //"code"     // Example program (Visual Studio Code)
-            };
-
-            //get all running processes
-            Process[] procs = Process.GetProcesses();
-            foreach(Process proc in procs)
-            {
-                if(proc.MainWindowTitle != "")
-                {
-                    //label2.Text += "Process: " + proc.ProcessName + ".exe" + ", Window Title: " + proc.MainWindowTitle + "\n";
-                }
-                    
-            }
-
-            this.audioDeviceName = GetAudioDevice();
-
-            ShowBaloonTip("Default Audio Device: " + this.audioDeviceName, true);
+            this.label4.Text = AudioSetter.GetAudioDevice();
 
             // Start monitoring processes
             StartProcessMonitor();
@@ -90,11 +61,35 @@ namespace Living_Room_PC_Utility
 
             // Attach Resize event manually if not already done in the designer file
             this.Resize += new EventHandler(Form1_Resize);
-            this.ShowInTaskbar = false;
+
+            //todo re-enbale
+            //this.ShowInTaskbar = false;
+
             this.Hide(); // Hide window when user tries to close it
         }
 
-            
+        public void SetProgramConfigs()
+        {
+            this.programConfigs = ProgramConfig.GetProgramConfigDictionary("both");
+        }
+
+        public void SetDefaultSoundDisplaySettings()
+        {
+            AudioSetter.SetSurround(0);
+            HDRController.SetGlobalHDRState(false);
+        }
+
+        private void PopulateConfigFields()
+        {
+            config = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\Config.ini"));
+
+            //TODO more safely try to fetch this value
+
+            comboBoxSurroundSound.SelectedIndex = Int32.Parse(config["Settings"]["surroundType"]);
+            comboBoxHdr.SelectedIndex = Int32.Parse(config["Settings"]["hdr"]);
+            comboBoxDolbyAtmos.SelectedIndex = Int32.Parse(config["Settings"]["atmos"]);
+            comboBoxVolumeSwitching.SelectedIndex = Int32.Parse(config["Settings"]["volume"]);
+        }
 
         // Start monitoring the processes
         private void StartProcessMonitor()
@@ -111,78 +106,72 @@ namespace Living_Room_PC_Utility
 
             Process[] activeProcesses = Process.GetProcesses();
 
-            KeyValuePair<string, int> tempProg = hasProgram("Audio", activeProcesses);
+            //TODO account for atmos and 5.1 maximum
 
+            //Surround Sound Switching
+            KeyValuePair<string, ProgramConfig> tempProg = hasProgram(this.programConfigs, activeProcesses);
             if (tempProg.Key != "" && this.specialProgram == "")
             {
                 this.specialProgram = tempProg.Key;
-                this.label2.Text = this.specialProgram + ": " + tempProg.Value;
+                this.label2.Text = this.specialProgram + ": " + tempProg.Value.toFriendlyString();
+
+                AudioSetter.SetSurround(Int32.Parse(tempProg.Value.SurroundSoundSetting));
+
                 this.ShowBaloonTip(specialProgram, true);
-            } else if (tempProg.Key == "" && this.specialProgram != "" )
+                //todo increase tick delay
+            }
+            else if (tempProg.Key == "" && this.specialProgram != "")
             {
+                AudioSetter.SetSurround(0);
                 this.ShowBaloonTip(specialProgram, false);
                 this.specialProgram = "";
                 this.label2.Text = "";
             }
 
+            //TODO HDR Switching
+
         }
 
-        public string GetAudioDevice()
-        {
-            var enumerator = new MMDeviceEnumerator();
-            var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-            return defaultDevice.FriendlyName;
-        }
-
-        private KeyValuePair<string, int> hasProgram(string configSection, Process[] activeProcesses)
+        private KeyValuePair<string, ProgramConfig> hasProgram(Dictionary<string, ProgramConfig> config, Process[] activeProcesses)
         {
 
-            foreach (var configProgram in globalConfigData[configSection])
+            foreach (Process activeProcess in activeProcesses)
             {
 
-                foreach (Process activeProcess in activeProcesses)
+                ProgramConfig tempProgConfigByExe;
+                bool hasConfigByEx = config.TryGetValue(activeProcess.ProcessName + ".exe", out tempProgConfigByExe);
+                if (hasConfigByEx)
                 {
-                    if (activeProcess.ProcessName + ".exe" == configProgram.KeyName
-                        || activeProcess.MainWindowTitle == configProgram.KeyName)
-                    {
-                        return new KeyValuePair<string, int>(configProgram.KeyName, Int32.Parse(configProgram.Value));
-                    }
+                    return new KeyValuePair<string, ProgramConfig>(activeProcess.ProcessName + ".exe", tempProgConfigByExe);
+                }
 
+                ProgramConfig tempProgConfigByTitle;
+                bool hasConfigByTitle = config.TryGetValue(activeProcess.MainWindowTitle, out tempProgConfigByTitle);
+                if (hasConfigByTitle)
+                {
+                    return new KeyValuePair<string, ProgramConfig>(activeProcess.MainWindowTitle, tempProgConfigByTitle);
                 }
 
             }
 
-            return new KeyValuePair<string, int>("",0);
-
+            return new KeyValuePair<string, ProgramConfig>("", new ProgramConfig()); //nothing found
         }
 
-        private void ShowBaloonTip(string processName, bool opened)
+
+        public void ShowBaloonTip(string processName, bool opened)
         {
             if (opened)
             {
                 trayIcon.BalloonTipTitle = $"{processName} Running";
                 trayIcon.BalloonTipText = $"{processName} has started.";
                 trayIcon.ShowBalloonTip(1000); // Show the balloon for 1 seconds
-            } else
+            }
+            else
             {
                 trayIcon.BalloonTipTitle = $"{processName} Closed";
                 trayIcon.BalloonTipText = $"{processName} has been closed.";
                 trayIcon.ShowBalloonTip(1000); // Show the balloon for 1s
             }
-
-        }
-
-        private void RunProg()
-        {
-
-            string paramString = "/SetSpeakersConfig";
-
-            System.Diagnostics.Process.Start((Path.Combine(Directory.GetCurrentDirectory(), @"resources\programs\svcl.exe")),
-                "/SetVolume AllAppVolume 100");
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
 
         }
 
@@ -206,7 +195,8 @@ namespace Living_Room_PC_Utility
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
-                this.Hide(); // Hide the window from the taskbar and minimize to tray
+                //TODO
+                //this.Hide(); // Hide the window from the taskbar and minimize to tray
                 //turning this off because it runs a couple times when the program launches
                 //trayIcon.ShowBalloonTip(3000, "App Running", "Click the tray icon to restore 1.", ToolTipIcon.Info); 
             }
@@ -215,25 +205,89 @@ namespace Living_Room_PC_Utility
         //Override FormClosing to ensure it doesn't close the application
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                e.Cancel = true;
-                this.WindowState = FormWindowState.Minimized;
-                this.Hide(); // Hide window when user tries to close it
-                trayIcon.ShowBalloonTip(3000, "App Minimized", "Click the tray icon to restore 2.", ToolTipIcon.Info);
-            }
-            base.OnFormClosing(e);
+            //TODO
+            //if (e.CloseReason == CloseReason.UserClosing)
+            //{
+            //    e.Cancel = true;
+            //    this.WindowState = FormWindowState.Minimized;
+            //    this.Hide(); // Hide window when user tries to close it
+            //    trayIcon.ShowBalloonTip(3000, "App Minimized", "Click the tray icon to restore 2.", ToolTipIcon.Info);
+            //}
+            //base.OnFormClosing(e);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Form2 form2 = new Form2();
+            FormTest form2 = new FormTest(this);
             form2.Show();
         }
 
         private void IconClick(object sender, System.EventArgs e)
         {
-            this.RestoreWindow(sender,e);
+            this.RestoreWindow(sender, e);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            trayIcon.BalloonTipTitle = $"Running";
+            trayIcon.BalloonTipText = this.audioDeviceName;
+            AudioSetter.SetSurround(0);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            AudioSetter.SetSurround(1);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            AudioSetter.SetSurround(2);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            AudioSetter.SetAtmos(true);
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            AudioSetter.SetAtmos(false);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            HDRController.SetGlobalHDRState(true);
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            HDRController.SetGlobalHDRState(false);
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            Form3 form3 = new Form3(this);
+            form3.Show();
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
 
     }
