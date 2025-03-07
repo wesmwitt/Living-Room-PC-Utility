@@ -4,6 +4,10 @@ using IniParser.Model;
 
 namespace Living_Room_PC_Utility
 {
+    //public struct ProgramConfigList
+    //{
+    //    public Dictionary<string, ProgramConfig> items = new Dictionary<string, ProgramConfig>;
+    //}
 
     public struct ProgramConfig
     {
@@ -112,6 +116,30 @@ namespace Living_Room_PC_Utility
         public string toFriendlyString()
         {
             return "Surround Sound: " + getSurroundSoundFriendlyName() + ", HDR: " + getHDRFriendlyName() + ", Delay: " + getDelayFriendlyName() + ", Volume: " + getVolumeFriendlyName();
+        }
+
+        public string toFriendlyStringConcise()
+        {
+            string str = "";
+
+            if(SurroundSoundSetting != "")
+            {
+                str += "Surround Sound: " + getSurroundSoundFriendlyName() + ", ";
+            }
+            if (HDRSetting != "")
+            {
+                str += "HDR: " + getHDRFriendlyName() + ", ";
+            }
+            if (DelaySetting != "")
+            {
+                str += "Delay: " + getDelayFriendlyName() + ", ";
+            }
+            if (VolumeSetting != "")
+            {
+                str += "Volume: " + getVolumeFriendlyName() + ", ";
+            }
+
+            return str.Substring(0,str.Length-2); //remove ", " from the end
         }
 
         public Dictionary<string, string> toDictionary()

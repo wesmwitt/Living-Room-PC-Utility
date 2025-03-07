@@ -2,7 +2,6 @@
 using AutoActions.Displays;
 using IniParser;
 using IniParser.Model;
-using Microsoft.VisualBasic;
 
 namespace Living_Room_PC_Utility
 {
@@ -29,6 +28,13 @@ namespace Living_Room_PC_Utility
 
         private void setButtonAndLabelStatus(int status)
         {
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<int>(setButtonAndLabelStatus), status);
+                return;
+            }
+
             //1 = Default
             if (status == 1)
             {
@@ -52,6 +58,7 @@ namespace Living_Room_PC_Utility
                 buttonStartTest.Enabled = false;
                 buttonStopTest.Enabled = true;
                 comboBoxTestHdr.Enabled = false;
+                labelResults.Text = "Detecting active channels...";
             }
             //3 = Test Complete
             if (status == 3)
@@ -74,12 +81,18 @@ namespace Living_Room_PC_Utility
 
         private void buttonStartTest_Click(object sender, EventArgs e)
         {
+            startTestThread();
+        }
+
+        public void startTestThread()
+        {
             Thread thread = new Thread(startTest);
             thread.Start();
         }
 
         private void startTest()
         {
+
 
             //TODO set surround to max level
             IniData config = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\Config.ini"));
@@ -95,7 +108,6 @@ namespace Living_Room_PC_Utility
             Thread.Sleep(500);
 
             this.setButtonAndLabelStatus(2);
-            labelResults.Text = "Detecting active channels...";
 
             results = detector.DetectActiveChannels();
             this.ProcessResults(results);
@@ -104,6 +116,12 @@ namespace Living_Room_PC_Utility
 
         private void ProcessResults(Dictionary<string, bool> results)
         {
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<Dictionary<string, bool>>(ProcessResults), results);
+                return;
+            }
 
             this.setButtonAndLabelStatus(3);
 
@@ -129,17 +147,22 @@ namespace Living_Room_PC_Utility
                 labelResults.Text += result.Key + ": " + result.Value + "\n";
             }
 
-            this.parentForm.ShowBaloonTip("hello", true);
+            //this.parentForm.ShowBaloonTip("hello", true);
 
         }
 
         private int calculateSurroundFormat(Dictionary<string, bool> results)
         {
-            if (results.Count == 8 && (results["Rear Left"] || results["Rear Right"]) && (results["Side Left"] || results["Side Right"]))
+            bool hasRearLeft = results.ContainsKey("Rear Left") && results["Rear Left"];
+            bool hasRearRight = results.ContainsKey("Rear Right") && results["Rear Right"];
+            bool hasSideLeft = results.ContainsKey("Side Left") && results["Side Left"];
+            bool hasSideRight = results.ContainsKey("Side Right") && results["Side Right"];
+
+            if (results.Count == 8 && (hasRearLeft || hasRearRight) && (hasSideLeft || hasSideRight))
             {
                 return 2; //7.1 Surround
             }
-            else if (results.Count >= 6 && (results["Rear Left"] || results["Rear Right"] || results["Side Left"] || results["Side Right"]))
+            else if (results.Count >= 6 && (hasRearLeft || hasRearRight || hasSideLeft || hasSideRight))
             {
                 return 1; //5.1 Surround
             }
@@ -185,14 +208,16 @@ namespace Living_Room_PC_Utility
                     tempProgConfig.HDRSetting = ProgramConfig.getSettingForFriendlyName("HDRSetting", hdrSetting.ToString());
                 }
 
-                parentForm.ShowBaloonTip(tempProgConfig.toFriendlyString(), true);
+                string title = "Saving program: " + selectedProgram + ".";
+                string text = tempProgConfig.toFriendlyStringConcise();
+                parentForm.ShowBaloonTip(title, text);
 
                 ProgramConfig.UpdateProgramConfigListUser(selectedProgram, tempProgConfig);
                 
             }
 
             //refresh configs on main form
-            parentForm.SetProgramConfigs();
+            parentForm.LoadAndSetProgramConfigs();
 
             this.setButtonAndLabelStatus(1);
         }
@@ -250,5 +275,12 @@ namespace Living_Room_PC_Utility
 
 
         }
+        public void SetIsTestingHdr(bool status)
+        {
+            comboBoxTestHdr.Text = (status) ? "Yes" : "No";
+            this.isTestingHdr = status;
+            
+        }
+
     }
 }

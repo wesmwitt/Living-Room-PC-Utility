@@ -65,7 +65,7 @@
             dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersWidth = 72;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(1156, 320);
+            dataGridView1.Size = new Size(832, 320);
             dataGridView1.TabIndex = 18;
             dataGridView1.SelectionChanged += DataGridView1_SelectionChanged;
             // 
@@ -277,7 +277,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1178, 744);
+            ClientSize = new Size(854, 657);
             Controls.Add(comboBoxDelayGlobal);
             Controls.Add(label1);
             Controls.Add(comboBoxHdrGlobal);

@@ -166,7 +166,7 @@
                 
                 ProgramConfig.UpdateProgramConfigListUser(selectedProgram, tempProgConfig);
                 LoadProgramConfigs();
-                parentForm.SetProgramConfigs();
+                parentForm.LoadAndSetProgramConfigs();
                 SetTableFromProgramConfigs();
                 SetBoxesFromSelectedRow();
                 this.SetSaveCancelButtons(false);

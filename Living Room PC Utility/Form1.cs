@@ -3,6 +3,11 @@ using IniParser;
 using IniParser.Model;
 using NAudio.CoreAudioApi;
 using AutoActions.Displays;
+using System.Management;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System;
 
 
 namespace Living_Room_PC_Utility
@@ -11,13 +16,30 @@ namespace Living_Room_PC_Utility
     {
         private NotifyIcon trayIcon;
         private System.Windows.Forms.Timer processMonitorTimer;
-        private string specialProgram = "";
-        private IniData config;
+
+        private string specialProgram = ""; //old
+
+        private int activeProgramPID = 0;
+        private string activeProgramStr = "";
+
+        private IniData configIni;
+        private GlobalConfig globalConfig = new GlobalConfig();
 
         FileIniDataParser parser = new FileIniDataParser();
 
         private Dictionary<string, ProgramConfig> programConfigs = new Dictionary<string, ProgramConfig>();
         private string audioDeviceName = "";
+
+        private ManagementEventWatcher processStartWatcher;
+        private ManagementEventWatcher processStopWatcher;
+        private HashSet<int> trackedProcesses = new HashSet<int>();
+
+        string[] processBlockList = ["svcl.exe", "svchost.exe", "taskhostw.exe", "msedgewebview2.exe", "conhost.exe", "backgroundTaskHost.exe", "RuntimeBroker.exe", "sppsvc.exe", "ROUTE.EXE",
+            "XboxPcTray.exe", "GameBar.exe", "XboxGameBarWidgets.exe", "GameBarFTServer.exe", "updater.exe", "dllhost.exe", "GameBarPresenceWriter.exe", "OAWrapper.exe",
+            "StandardCollector.Service.exe", "steamwebhelper.exe", "consent.exe", "steamservice.exe", "cmd.exe", "SearchProtocolHost.exe", "SearchFilterHost.exe", "GameOverlayUI.exe",
+            "CompPkgSrv.exe", "x64launcher.exe", "Living Room PC Utility.exe", "git.exe", "smartscreen.exe", "Taskmgr.exe", "WindowsPackageManagerServer.exe", "CompatTelRunner.exe",
+            "Living Room PC Utility.exe", "MoUsoCoreWorker.exe", "csc.exe", "cvtres.exe", "",
+        ];
 
         public Form1()
         {
@@ -26,14 +48,28 @@ namespace Living_Room_PC_Utility
             // Set up the NotifyIcon (system tray icon)
             trayIcon = new NotifyIcon()
             {
-                Icon = SystemIcons.Application, // Use your custom icon if needed
+                Icon = new System.Drawing.Icon(@"resources\icons\tray-icon.ico"), // Use your custom icon if needed
                 Visible = true,
-                Text = "Taskbar Monitor"
+                Text = "Living Room PC Utility"
             };
 
             // Add a right-click context menu to the tray icon
             trayIcon.ContextMenuStrip = new ContextMenuStrip();
-            trayIcon.ContextMenuStrip.Items.Add("Show GUI", null, RestoreWindow);
+            trayIcon.ContextMenuStrip.Items.Add("Show Main GUI", null, RestoreWindow);
+            trayIcon.ContextMenuStrip.Items.Add("-");
+            trayIcon.ContextMenuStrip.Items.Add("Test Program (HDR Off)", null, TestProgram);
+            trayIcon.ContextMenuStrip.Items.Add("Test Program (HDR On)", null, TestProgramWithHdr);
+            trayIcon.ContextMenuStrip.Items.Add("-");
+            trayIcon.ContextMenuStrip.Items.Add("Stereo", null, (s, e) => AudioSetter.SetSurround(0));
+            trayIcon.ContextMenuStrip.Items.Add("5.1 Surround", null, (s, e) => AudioSetter.SetSurround(1));
+            trayIcon.ContextMenuStrip.Items.Add("7.1 Surround", null, (s, e) => AudioSetter.SetSurround(2));
+            trayIcon.ContextMenuStrip.Items.Add("-");
+            trayIcon.ContextMenuStrip.Items.Add("Atmos On", null, (s, e) => AudioSetter.SetAtmos(true));
+            trayIcon.ContextMenuStrip.Items.Add("Atmos Off", null, (s, e) => AudioSetter.SetAtmos(true));
+            trayIcon.ContextMenuStrip.Items.Add("-");
+            trayIcon.ContextMenuStrip.Items.Add("HDR On", null, (s, e) => HDRController.SetGlobalHDRState(true));
+            trayIcon.ContextMenuStrip.Items.Add("HDR Off", null, (s, e) => HDRController.SetGlobalHDRState(false));
+            trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Exit", null, ExitApp);
 
             trayIcon.DoubleClick += new System.EventHandler(IconClick);
@@ -44,31 +80,34 @@ namespace Living_Room_PC_Utility
             // Add the DLL directory to the PATH environment variable at runtime
             Environment.SetEnvironmentVariable("PATH", $"{dllPath};{Environment.GetEnvironmentVariable("PATH")}");
 
-            this.SetProgramConfigs();
+            this.LoadAndSetProgramConfigs();
 
             this.SetDefaultSoundDisplaySettings();
 
-            this.PopulateConfigFields();
+            this.ProcessGlobalConfig();
 
             this.label4.Text = AudioSetter.GetAudioDevice();
 
-            // Start monitoring processes
-            StartProcessMonitor();
+            StartProcessMonitoring();
 
+            Process[] activeProcesses = Process.GetProcesses();
+
+            // Start monitoring processes
+            //StartProcessMonitor();
 
             //TODO Re-enable this
-            //this.WindowState = FormWindowState.Minimized;
+            this.WindowState = FormWindowState.Minimized;
 
             // Attach Resize event manually if not already done in the designer file
-            this.Resize += new EventHandler(Form1_Resize);
+            //this.Resize += new EventHandler(Form1_Resize);
 
             //todo re-enbale
-            //this.ShowInTaskbar = false;
+            this.ShowInTaskbar = false;
 
             this.Hide(); // Hide window when user tries to close it
         }
 
-        public void SetProgramConfigs()
+        public void LoadAndSetProgramConfigs()
         {
             this.programConfigs = ProgramConfig.GetProgramConfigDictionary("both");
         }
@@ -76,29 +115,335 @@ namespace Living_Room_PC_Utility
         public void SetDefaultSoundDisplaySettings()
         {
             AudioSetter.SetSurround(0);
+            AudioSetter.SetAtmos(false);
             HDRController.SetGlobalHDRState(false);
         }
 
+        private void ProcessGlobalConfig()
+        {
+            this.configIni = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\Config.ini"));
+            this.globalConfig = new GlobalConfig(
+                configIni["Settings"]["surroundType"],
+                configIni["Settings"]["hdr"],
+                configIni["Settings"]["atmos"],
+                configIni["Settings"]["volume"]
+                );
+            this.PopulateConfigFields();
+        }
         private void PopulateConfigFields()
         {
-            config = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\Config.ini"));
+            comboBoxSurroundSound.SelectedIndex = this.globalConfig.SurroundSoundSetting;
+            comboBoxHdr.SelectedIndex = this.globalConfig.HDRSetting;
+            comboBoxDolbyAtmos.SelectedIndex = this.globalConfig.AtmosSetting;
+            comboBoxVolumeSwitching.SelectedIndex = this.globalConfig.VolumeSetting;
 
-            //TODO more safely try to fetch this value
-
-            comboBoxSurroundSound.SelectedIndex = Int32.Parse(config["Settings"]["surroundType"]);
-            comboBoxHdr.SelectedIndex = Int32.Parse(config["Settings"]["hdr"]);
-            comboBoxDolbyAtmos.SelectedIndex = Int32.Parse(config["Settings"]["atmos"]);
-            comboBoxVolumeSwitching.SelectedIndex = Int32.Parse(config["Settings"]["volume"]);
+            this.buttonSaveConfig.Enabled = false;
+            this.buttonCancelConfig.Enabled = false;
         }
+
+        // -- NEW METHOD -----------------------------
+
+        private void StartProcessMonitoring()
+        {
+            try
+            {
+                // WMI Query to detect new processes
+                WqlEventQuery startQuery = new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace");
+                processStartWatcher = new ManagementEventWatcher(startQuery);
+                processStartWatcher.EventArrived += new EventArrivedEventHandler(OnProcessStarted);
+                processStartWatcher.Start();
+
+                // WMI Query to detect closed processes
+                WqlEventQuery stopQuery = new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace");
+                processStopWatcher = new ManagementEventWatcher(stopQuery);
+                processStopWatcher.EventArrived += new EventArrivedEventHandler(OnProcessStopped);
+                processStopWatcher.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error starting process monitor: " + ex.Message);
+            }
+        }
+
+        private void OnProcessStarted(object sender, EventArrivedEventArgs e)
+        {
+            try
+            {
+
+                int processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
+                string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
+
+                if (!processBlockList.Contains(processName))
+                {
+                    trackedProcesses.Add(processId);
+
+                    Task.Run(() =>
+                    {
+                        string windowTitle = GetWindowTitle(processId);
+                        Debug.WriteLine($"New Process Detected: {processName} - {windowTitle} - {processId}");
+                        TrySetActiveProgram(processName, windowTitle, processId, this.programConfigs);
+                    });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error handling process start event: " + ex.Message);
+            }
+        }
+
+        private void OnProcessStopped(object sender, EventArrivedEventArgs e)
+        {
+            try
+            {
+                int processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
+
+                if (trackedProcesses.Contains(processId))
+                {
+                    trackedProcesses.Remove(processId);
+                    Debug.WriteLine($"Process Closed: PID {processId}");
+                    TryUnsetActiveProgram(processId);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error handling process stop event: " + ex.Message);
+            }
+        }
+
+        private string GetWindowTitle(int processId)
+        {
+            try
+            {
+
+                Process process = Process.GetProcessById(processId);
+
+                if (process.ProcessName == "ApplicationFrameHost")
+                {
+                    return GetUWPWindowTitle(processId);
+                }
+
+                if (process.MainWindowHandle != IntPtr.Zero)
+                {
+                    return process.MainWindowTitle;
+                }
+
+            }
+            catch
+            {
+                // Process might have exited
+            }
+            return string.Empty;
+        }
+
+        private string GetUWPWindowTitle(int parentProcessId)
+        {
+            foreach (Process process in Process.GetProcesses())
+            {
+                if (process.ProcessName != "ApplicationFrameHost" && process.MainWindowHandle != IntPtr.Zero)
+                //if (process.ProcessName == "ApplicationFrameHost" && process.MainWindowHandle != IntPtr.Zero)
+                {
+                    try
+                    {
+                        int parentId = GetParentProcessId(process.Id);
+                        if (parentId == parentProcessId)
+                        {
+                            return process.MainWindowTitle;
+                        }
+                    }
+                    catch { }
+                }
+            }
+            return "Unknown UWP App";
+        }
+
+        private int GetParentProcessId(int processId)
+        {
+            try
+            {
+                using (ManagementObject mo = new ManagementObject($"Win32_Process.Handle='{processId}'"))
+                {
+                    mo.Get();
+                    return Convert.ToInt32(mo["ParentProcessId"]);
+                }
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+
+        private void TrySetActiveProgramOnDemand()
+        {
+
+            Process[] activeProcesses = Process.GetProcesses();
+
+            foreach (Process activeProcess in activeProcesses)
+            {
+
+                ProgramConfig tempProgConfigByExe;
+                bool hasConfigByExe = (this.programConfigs.TryGetValue(activeProcess.ProcessName + ".exe", out tempProgConfigByExe));
+                ProgramConfig tempProgConfigByTitle;
+                bool hasConfigByTitle = (this.programConfigs.TryGetValue(activeProcess.MainWindowTitle, out tempProgConfigByTitle));
+
+                if (hasConfigByExe)
+                {
+                    this.activeProgramStr = activeProcess.ProcessName + ".exe";
+                }
+                else if (hasConfigByTitle)
+                {
+                    this.activeProgramStr = activeProcess.MainWindowTitle;
+                }
+
+                if (hasConfigByExe || hasConfigByTitle)
+                {
+                    //set pid
+                    this.activeProgramPID = activeProcess.Id;
+                    this.trackedProcesses.Add(activeProcess.Id);
+
+                    //set friendly name
+                    label2.Invoke((Action)delegate
+                    {
+                        label2.Text = this.activeProgramStr;
+                    });
+
+                    //set attributes
+                    KeyValuePair<string, ProgramConfig> tempProg = GetProgramFromConfig(this.programConfigs, this.activeProgramStr);
+
+                    this.ShowProgramStatusBaloon(true, this.activeProgramStr, tempProg.Value);
+
+                    this.SetSoundDisplaySettingsForProgramConfig(tempProg.Value);
+                }
+
+            }
+
+        }
+
+        public void TrySetActiveProgram(string programName, string programTitle, int programPID, Dictionary<string, ProgramConfig> config)
+        {
+
+            //only set if there's not an active program still running
+            if (this.activeProgramPID != 0)
+            {
+                Debug.WriteLine("There is already a program active, skipping for now");
+                return;
+            }
+
+            if ((programName == "" && programTitle == "") || programPID == 0)
+            {
+                Debug.WriteLine("TrySetActiveProgram Error: Missing Param");
+                return;
+            }
+
+            ProgramConfig tempProgConfigByExe;
+            bool hasConfigByExe = config.TryGetValue(programName, out tempProgConfigByExe);
+
+            ProgramConfig tempProgConfigByTitle;
+            bool hasConfigByTitle = false;
+            if (programTitle != "")
+            {
+                hasConfigByTitle = config.TryGetValue(programTitle, out tempProgConfigByTitle);
+            }
+
+            if (hasConfigByExe)
+            {
+                Debug.WriteLine($"Has config by name (exe): {programName} with pid: {programPID}");
+                this.activeProgramStr = programName;
+            }
+            else if (hasConfigByTitle)
+            {
+                Debug.WriteLine($"Has config by title: {programTitle} with pid: {programPID}");
+                this.activeProgramStr = programTitle;
+
+            }
+
+            if (hasConfigByExe || hasConfigByTitle)
+            {
+                //set pid
+                this.activeProgramPID = programPID;
+
+                //set friendly name
+                label2.Invoke((Action)delegate
+                {
+                    label2.Text = this.activeProgramStr;
+                });
+
+                //set attributes
+                KeyValuePair<string, ProgramConfig> tempProg = GetProgramFromConfig(this.programConfigs, this.activeProgramStr);
+
+                this.ShowProgramStatusBaloon(true, this.activeProgramStr, tempProg.Value);
+
+                this.SetSoundDisplaySettingsForProgramConfig(tempProg.Value);
+            }
+
+        }
+
+        public void TryUnsetActiveProgram(int pid)
+        {
+            if (this.activeProgramPID == pid)
+            {
+                ShowProgramStatusBaloon(false, this.activeProgramStr);
+                this.activeProgramPID = 0;
+                this.activeProgramStr = "";
+                this.SetDefaultSoundDisplaySettings();
+                label2.Invoke((Action)delegate
+                {
+                    label2.Text = "";
+                });
+            }
+        }
+
+        public void SetSoundDisplaySettingsForProgramConfig(ProgramConfig prog)
+        {
+
+            int programSurroundValue = Int32.Parse(prog.SurroundSoundSetting);
+            //if surround sound switching is enabled
+            if (this.globalConfig.SurroundSoundSetting > 0)
+            {
+                //if the program supports a higher value than the user's computer
+                if (programSurroundValue > this.globalConfig.SurroundSoundSetting)
+                {
+                    //we only set it to the highest supported setting
+                    programSurroundValue = this.globalConfig.SurroundSoundSetting;
+                }
+                AudioSetter.SetSurround(programSurroundValue);
+            }
+
+            //if atmos is enabled
+            if (this.globalConfig.AtmosSetting > 0)
+            {
+                AudioSetter.SetAtmos(true);
+            }
+
+            if (this.globalConfig.HDRSetting > 0)
+            {
+                bool hdrState = false;
+                if (prog.HDRSetting == "1")
+                {
+                    hdrState = true;
+                }
+                HDRController.SetGlobalHDRState(hdrState);
+            }
+
+            if (this.globalConfig.VolumeSetting > 0)
+            {
+                //TODO set volume
+            }
+
+        }
+
+
+
+        //-------------------------------------------
 
         // Start monitoring the processes
-        private void StartProcessMonitor()
-        {
-            processMonitorTimer = new System.Windows.Forms.Timer();
-            processMonitorTimer.Interval = 100; // Check every 1/10 second ;;TODO CHANGE BACK TO 100
-            processMonitorTimer.Tick += ProcessMonitorTimer_Tick;
-            processMonitorTimer.Start();
-        }
+        //private void StartProcessMonitor()
+        //{
+        //    processMonitorTimer = new System.Windows.Forms.Timer();
+        //    processMonitorTimer.Interval = 10000; // Check every 1/10 second ;;TODO CHANGE BACK TO 100
+        //    processMonitorTimer.Tick += ProcessMonitorTimer_Tick;
+        //    processMonitorTimer.Start();
+        //}
 
         // Process monitoring logic
         private void ProcessMonitorTimer_Tick(object sender, EventArgs e)
@@ -117,19 +462,32 @@ namespace Living_Room_PC_Utility
 
                 AudioSetter.SetSurround(Int32.Parse(tempProg.Value.SurroundSoundSetting));
 
-                this.ShowBaloonTip(specialProgram, true);
+                //this.ShowBaloonTip(specialProgram, true);
                 //todo increase tick delay
             }
             else if (tempProg.Key == "" && this.specialProgram != "")
             {
                 AudioSetter.SetSurround(0);
-                this.ShowBaloonTip(specialProgram, false);
+                //this.ShowBaloonTip(specialProgram, false);
                 this.specialProgram = "";
                 this.label2.Text = "";
             }
 
             //TODO HDR Switching
 
+        }
+
+        private KeyValuePair<string, ProgramConfig> GetProgramFromConfig(Dictionary<string, ProgramConfig> config, string progLabel)
+        {
+
+            ProgramConfig tempProgConfigByExe;
+            bool hasConfig = config.TryGetValue(progLabel, out tempProgConfigByExe);
+            if (hasConfig)
+            {
+                return new KeyValuePair<string, ProgramConfig>(progLabel, tempProgConfigByExe);
+            }
+
+            return new KeyValuePair<string, ProgramConfig>("", new ProgramConfig()); //nothing found
         }
 
         private KeyValuePair<string, ProgramConfig> hasProgram(Dictionary<string, ProgramConfig> config, Process[] activeProcesses)
@@ -157,22 +515,31 @@ namespace Living_Room_PC_Utility
             return new KeyValuePair<string, ProgramConfig>("", new ProgramConfig()); //nothing found
         }
 
-
-        public void ShowBaloonTip(string processName, bool opened)
+        public void ShowProgramStatusBaloon(bool openStatus, string process)
         {
-            if (opened)
-            {
-                trayIcon.BalloonTipTitle = $"{processName} Running";
-                trayIcon.BalloonTipText = $"{processName} has started.";
-                trayIcon.ShowBalloonTip(1000); // Show the balloon for 1 seconds
-            }
-            else
-            {
-                trayIcon.BalloonTipTitle = $"{processName} Closed";
-                trayIcon.BalloonTipText = $"{processName} has been closed.";
-                trayIcon.ShowBalloonTip(1000); // Show the balloon for 1s
-            }
+            string status = (openStatus) ? "opened" : "closed";
+            string settingChange = (openStatus) ? "Adjusting settings accordingly." : "Restoring default settings.";
+            trayIcon.BalloonTipTitle = $"{process} has {status}";
+            trayIcon.BalloonTipText = $"{settingChange}";
+            trayIcon.ShowBalloonTip(1000);
 
+        }
+
+        public void ShowProgramStatusBaloon(bool openStatus, string process, ProgramConfig programConfig)
+        {
+
+            string status = (openStatus) ? "opened" : "closed";
+
+            trayIcon.BalloonTipTitle = $"{process} has {status}.";
+            trayIcon.BalloonTipText = $"{programConfig.toFriendlyStringConcise()}.";
+            trayIcon.ShowBalloonTip(1000);
+        }
+
+        public void ShowBaloonTip(string title, string text)
+        {
+            trayIcon.BalloonTipTitle = title;
+            trayIcon.BalloonTipText = text;
+            trayIcon.ShowBalloonTip(1000);
         }
 
         // Exit the application (right-click menu option)
@@ -196,98 +563,127 @@ namespace Living_Room_PC_Utility
             if (this.WindowState == FormWindowState.Minimized)
             {
                 //TODO
-                //this.Hide(); // Hide the window from the taskbar and minimize to tray
+                this.Hide(); // Hide the window from the taskbar and minimize to tray
                 //turning this off because it runs a couple times when the program launches
-                //trayIcon.ShowBalloonTip(3000, "App Running", "Click the tray icon to restore 1.", ToolTipIcon.Info); 
+                //todo figure out
+                //trayIcon.ShowBalloonTip(3000, "App Running", "Click the tray icon to restore 1.", ToolTipIcon.Info);
             }
         }
 
         //Override FormClosing to ensure it doesn't close the application
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            Debug.WriteLine("Closing Form: " + e.CloseReason.ToString());
             //TODO
-            //if (e.CloseReason == CloseReason.UserClosing)
-            //{
-            //    e.Cancel = true;
-            //    this.WindowState = FormWindowState.Minimized;
-            //    this.Hide(); // Hide window when user tries to close it
-            //    trayIcon.ShowBalloonTip(3000, "App Minimized", "Click the tray icon to restore 2.", ToolTipIcon.Info);
-            //}
-            //base.OnFormClosing(e);
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                this.WindowState = FormWindowState.Minimized;
+                this.Hide(); // Hide window when user tries to close it
+                trayIcon.ShowBalloonTip(3000, "Living Room PC Utility Minimized to Tray", "Double-click the tray icon to restore or right click the icon and select Exit to close.", ToolTipIcon.Info);
+            }
+            else if (e.CloseReason == CloseReason.ApplicationExitCall)
+            {
+                processStartWatcher?.Stop();
+                processStartWatcher?.Dispose();
+            }
+            base.OnFormClosing(e);
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            FormTest form2 = new FormTest(this);
-            form2.Show();
-        }
-
+        
         private void IconClick(object sender, System.EventArgs e)
         {
             this.RestoreWindow(sender, e);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            trayIcon.BalloonTipTitle = $"Running";
-            trayIcon.BalloonTipText = this.audioDeviceName;
-            AudioSetter.SetSurround(0);
+            this.buttonSaveConfig.Enabled = true;
+            this.buttonCancelConfig.Enabled = true;
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            AudioSetter.SetSurround(1);
+            this.buttonSaveConfig.Enabled = true;
+            this.buttonCancelConfig.Enabled = true;
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            AudioSetter.SetSurround(2);
+            this.buttonSaveConfig.Enabled = true;
+            this.buttonCancelConfig.Enabled = true;
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
         {
-            AudioSetter.SetAtmos(true);
+            this.buttonSaveConfig.Enabled = true;
+            this.buttonCancelConfig.Enabled = true;
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void buttonSaveConfig_Click(object sender, EventArgs e)
         {
-            AudioSetter.SetAtmos(false);
+            this.buttonSaveConfig.Enabled = false;
+            this.buttonCancelConfig.Enabled = false;
+
+            GlobalConfig.UpdateConfigFile(
+                comboBoxSurroundSound.SelectedIndex,
+                comboBoxDolbyAtmos.SelectedIndex,
+                comboBoxHdr.SelectedIndex,
+                comboBoxVolumeSwitching.SelectedIndex
+                );
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void buttonCancelConfig_Click(object sender, EventArgs e)
         {
-            HDRController.SetGlobalHDRState(true);
+            this.PopulateConfigFields();
+
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
-            HDRController.SetGlobalHDRState(false);
+            TrySetActiveProgramOnDemand();
+            this.getOpenPrograms();
         }
 
-        private void button9_Click(object sender, EventArgs e)
+        private void programListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Form3 form3 = new Form3(this);
             form3.Show();
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void testProgramToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            FormTest form2 = new FormTest(this);
+            form2.Show();
         }
 
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private void TestProgram(object sender, EventArgs e)
         {
-
+            this.RestoreWindow(null,null);
+            FormTest form2 = new FormTest(this);
+            form2.Show();
+            form2.SetIsTestingHdr(false);
+            form2.startTestThread();
         }
 
-        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        private void TestProgramWithHdr(object sender, EventArgs e)
         {
-
+            this.RestoreWindow(null, null);
+            FormTest form2 = new FormTest(this);
+            form2.Show();
+            form2.SetIsTestingHdr(true);
+            form2.startTestThread();
         }
 
-        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        private void getOpenPrograms()
         {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process");
 
+            Debug.WriteLine($"----------getOpenPrograms()----------");
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                Debug.WriteLine($"PID: {obj["ProcessId"]}, Name: {obj["Name"]}");
+            }
+            Debug.WriteLine($"----------getOpenPrograms()----------");
         }
 
     }
