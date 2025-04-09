@@ -30,7 +30,7 @@ namespace Living_Room_PC_Utility
             this.ShutdownScript = "";
         }
 
-        public ProgramConfig(string surroundSoundSetting="0", string hdrSetting="0", string delaySetting="0", string volumeSetting="", string startupScript="", string shutdownScript="")
+        public ProgramConfig(string surroundSoundSetting="0", string hdrSetting="0", string delaySetting="0", string volumeSetting="0", string startupScript="", string shutdownScript="")
 
         {
             SurroundSoundSetting = surroundSoundSetting;
@@ -254,8 +254,6 @@ namespace Living_Room_PC_Utility
             var parser = new FileIniDataParser();
             IniData programConfigListUser = parser.ReadFile(path);
             var programConfigListUserDictionary = GetProgramConfigDictionary("user");
-
-            //TODO logic to delete if receiving "" for value
 
             foreach (var section in programConfigListUser.Sections)
             {

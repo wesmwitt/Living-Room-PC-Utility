@@ -219,6 +219,9 @@ namespace Living_Room_PC_Utility
             //refresh configs on main form
             parentForm.LoadAndSetProgramConfigs();
 
+            //refresh to account for changes
+            parentForm.TrySetActiveProgramOnDemand();
+
             this.setButtonAndLabelStatus(1);
         }
 
@@ -227,8 +230,6 @@ namespace Living_Room_PC_Utility
         {
 
             parentForm.SetDefaultSoundDisplaySettings();
-
-            //TODO reset form
 
             this.setButtonAndLabelStatus(1);
 

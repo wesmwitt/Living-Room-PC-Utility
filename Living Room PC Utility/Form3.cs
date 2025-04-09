@@ -1,4 +1,6 @@
-﻿namespace Living_Room_PC_Utility
+﻿using System.Diagnostics;
+
+namespace Living_Room_PC_Utility
 {
     public partial class Form3 : Form
     {
@@ -36,6 +38,7 @@
                 dataGridView1.Rows.Add(item.Key,
                     item.Value.getSurroundSoundFriendlyName(),
                     item.Value.getHDRFriendlyName(),
+                    item.Value.getVolumeFriendlyName(),
                     item.Value.getDelayFriendlyName()
                     );
             }
@@ -74,12 +77,21 @@
                     var selectedConfigUser = programConfigsUser[selectedProgram];
                     comboBoxSoundMode.Text = selectedConfigUser.getSurroundSoundFriendlyName();
                     comboBoxHdr.Text = selectedConfigUser.getHDRFriendlyName();
+
+                    int defaultVolume = 0;
+                    if (int.TryParse(selectedConfigUser.VolumeSetting, out int defVolNum))
+                    {
+                        defaultVolume = defVolNum;
+                    }
+                    numericUpDownVolume.Value = defaultVolume;
+
                     comboBoxDelay.Text = selectedConfigUser.getDelayFriendlyName();
                 }
                 else
                 {
                     comboBoxSoundMode.Text = "";
                     comboBoxHdr.Text = "";
+                    numericUpDownVolume.Value = 0;
                     comboBoxDelay.Text = "";
                 }
 
@@ -89,6 +101,7 @@
                     comboBoxSoundModeGlobal.Text = selectedConfigGlobal.getSurroundSoundFriendlyName();
                     comboBoxHdrGlobal.Text = selectedConfigGlobal.getHDRFriendlyName();
                     comboBoxDelayGlobal.Text = selectedConfigGlobal.getDelayFriendlyName();
+                    //global does not have a volume setting
                 }
                 else
                 {
@@ -111,6 +124,11 @@
         }
 
         private void comboBoxDelay_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.SetSaveCancelButtons(true);
+        }
+
+        private void numericUpDownDefaultVolume_ValueChanged(object sender, EventArgs e)
         {
             this.SetSaveCancelButtons(true);
         }
@@ -139,8 +157,8 @@
         private void buttonSave_Click(object sender, EventArgs e)
         {
             var selectedProgram = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
-            
-            if(selectedProgram != null)
+
+            if (selectedProgram != null)
             {
 
                 var tempProgConfig = new ProgramConfig();
@@ -163,17 +181,31 @@
                 {
                     tempProgConfig.DelaySetting = ProgramConfig.getSettingForFriendlyName("DelaySetting", delaySetting.ToString());
                 }
-                
+
+                var volumeSetting = numericUpDownVolume.Value;
+                if(volumeSetting != 0)
+                {
+                    tempProgConfig.VolumeSetting = ""+volumeSetting;
+                }
+
                 ProgramConfig.UpdateProgramConfigListUser(selectedProgram, tempProgConfig);
                 LoadProgramConfigs();
                 parentForm.LoadAndSetProgramConfigs();
+
+                //refresh to account for changes
+                parentForm.TrySetActiveProgramOnDemand();
+
                 SetTableFromProgramConfigs();
                 SetBoxesFromSelectedRow();
                 this.SetSaveCancelButtons(false);
 
             }
 
-            
+
+        }
+
+        private void labelVolume_Click(object sender, EventArgs e)
+        {
 
         }
 

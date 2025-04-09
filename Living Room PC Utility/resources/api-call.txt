@@ -1,0 +1,6 @@
+curl --location "http://homeassistant.local:8123/api/services/media_player/volume_set" --header "Content-Type: application/json" --header "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmZjdlY2YzZTM0ZTI0ZGJmYjFjYTZmYjFhNTAyNzhlZCIsImlhdCI6MTczOTEzNDI4MywiZXhwIjoyMDU0NDk0MjgzfQ.VIzbuXq6LPfFvaOADtyaVerSaB6LTnJbKRsN8Ll7zDc" 
+--data 
+"{
+  \"entity_id\": \"media_player.denon_avr_x3800h\",
+  \"volume_level\": 0.45
+}"

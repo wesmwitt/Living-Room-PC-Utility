@@ -32,6 +32,7 @@
             ProgName = new DataGridViewTextBoxColumn();
             Sound = new DataGridViewTextBoxColumn();
             HDR = new DataGridViewTextBoxColumn();
+            Volume = new DataGridViewTextBoxColumn();
             Delay = new DataGridViewTextBoxColumn();
             comboBoxHdr = new ComboBox();
             labelHdr = new Label();
@@ -49,7 +50,10 @@
             label2 = new Label();
             comboBoxSoundModeGlobal = new ComboBox();
             label3 = new Label();
+            labelVolume = new Label();
+            numericUpDownVolume = new NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownVolume).BeginInit();
             SuspendLayout();
             // 
             // dataGridView1
@@ -58,7 +62,7 @@
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { ProgName, Sound, HDR, Delay });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { ProgName, Sound, HDR, Volume, Delay });
             dataGridView1.Location = new Point(11, 11);
             dataGridView1.Margin = new Padding(2);
             dataGridView1.Name = "dataGridView1";
@@ -95,6 +99,15 @@
             HDR.ReadOnly = true;
             HDR.Width = 85;
             // 
+            // Volume
+            // 
+            Volume.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            Volume.HeaderText = "Volume";
+            Volume.MinimumWidth = 8;
+            Volume.Name = "Volume";
+            Volume.ReadOnly = true;
+            Volume.Width = 108;
+            // 
             // Delay
             // 
             Delay.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
@@ -129,7 +142,7 @@
             // buttonCancel
             // 
             buttonCancel.Enabled = false;
-            buttonCancel.Location = new Point(360, 611);
+            buttonCancel.Location = new Point(360, 688);
             buttonCancel.Margin = new Padding(2);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(109, 33);
@@ -141,7 +154,7 @@
             // buttonSave
             // 
             buttonSave.Enabled = false;
-            buttonSave.Location = new Point(246, 611);
+            buttonSave.Location = new Point(246, 688);
             buttonSave.Margin = new Padding(2);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(109, 33);
@@ -177,9 +190,9 @@
             labelDelay.AutoSize = true;
             labelDelay.Location = new Point(246, 508);
             labelDelay.Name = "labelDelay";
-            labelDelay.Size = new Size(56, 25);
+            labelDelay.Size = new Size(60, 25);
             labelDelay.TabIndex = 43;
-            labelDelay.Text = "Delay";
+            labelDelay.Text = "Delay:";
             // 
             // comboBoxDelay
             // 
@@ -188,7 +201,7 @@
             comboBoxDelay.Items.AddRange(new object[] { "Unset", "Disabled", "Enabled" });
             comboBoxDelay.Location = new Point(246, 536);
             comboBoxDelay.Name = "comboBoxDelay";
-            comboBoxDelay.Size = new Size(182, 33);
+            comboBoxDelay.Size = new Size(177, 33);
             comboBoxDelay.TabIndex = 44;
             comboBoxDelay.SelectedIndexChanged += comboBoxDelay_SelectedIndexChanged;
             // 
@@ -219,7 +232,7 @@
             comboBoxDelayGlobal.Items.AddRange(new object[] { "Disabled", "Enabled" });
             comboBoxDelayGlobal.Location = new Point(12, 536);
             comboBoxDelayGlobal.Name = "comboBoxDelayGlobal";
-            comboBoxDelayGlobal.Size = new Size(182, 33);
+            comboBoxDelayGlobal.Size = new Size(177, 33);
             comboBoxDelayGlobal.TabIndex = 52;
             // 
             // label1
@@ -227,9 +240,9 @@
             label1.AutoSize = true;
             label1.Location = new Point(12, 508);
             label1.Name = "label1";
-            label1.Size = new Size(56, 25);
+            label1.Size = new Size(60, 25);
             label1.TabIndex = 51;
-            label1.Text = "Delay";
+            label1.Text = "Delay:";
             // 
             // comboBoxHdrGlobal
             // 
@@ -273,11 +286,30 @@
             label3.TabIndex = 47;
             label3.Text = "Surround Sound:";
             // 
+            // labelVolume
+            // 
+            labelVolume.AutoSize = true;
+            labelVolume.Location = new Point(473, 385);
+            labelVolume.Name = "labelVolume";
+            labelVolume.Size = new Size(168, 25);
+            labelVolume.TabIndex = 56;
+            labelVolume.Text = "Volume (0 is Unset):";
+            // 
+            // numericUpDownVolume
+            // 
+            numericUpDownVolume.Location = new Point(473, 413);
+            numericUpDownVolume.Name = "numericUpDownVolume";
+            numericUpDownVolume.Size = new Size(180, 31);
+            numericUpDownVolume.TabIndex = 57;
+            numericUpDownVolume.ValueChanged += numericUpDownDefaultVolume_ValueChanged;
+            // 
             // Form3
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(854, 657);
+            ClientSize = new Size(854, 741);
+            Controls.Add(numericUpDownVolume);
+            Controls.Add(labelVolume);
             Controls.Add(comboBoxDelayGlobal);
             Controls.Add(label1);
             Controls.Add(comboBoxHdrGlobal);
@@ -300,6 +332,7 @@
             Text = "Program Settings";
             Load += Form3_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownVolume).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -327,5 +360,9 @@
         private Label label2;
         private ComboBox comboBoxSoundModeGlobal;
         private Label label3;
+        private DataGridViewTextBoxColumn Volume;
+        private Label labelVolume;
+        private TextBox textBox1;
+        private NumericUpDown numericUpDownVolume;
     }
 }

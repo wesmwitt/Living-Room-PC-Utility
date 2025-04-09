@@ -114,9 +114,25 @@ namespace Living_Room_PC_Utility
 
         public void SetDefaultSoundDisplaySettings()
         {
-            AudioSetter.SetSurround(0);
-            AudioSetter.SetAtmos(false);
-            HDRController.SetGlobalHDRState(false);
+            if (this.globalConfig.SurroundSoundSetting > 0)
+            {
+                AudioSetter.SetSurround(0);
+            }
+
+            if(this.globalConfig.AtmosSetting > 0)
+            {
+                AudioSetter.SetAtmos(false);
+            }
+
+            if(this.globalConfig.HDRSetting > 0)
+            {
+                HDRController.SetGlobalHDRState(false);
+            }
+
+            if(this.globalConfig.VolumeSetting > 0)
+            {
+                VolumeSetter.SetReceiverVolume(this.globalConfig.DefaultVolumeSetting);
+            }
         }
 
         private void ProcessGlobalConfig()
@@ -126,7 +142,8 @@ namespace Living_Room_PC_Utility
                 configIni["Settings"]["surroundType"],
                 configIni["Settings"]["hdr"],
                 configIni["Settings"]["atmos"],
-                configIni["Settings"]["volume"]
+                configIni["Settings"]["volume"],
+                configIni["Settings"]["defaultVolume"]
                 );
             this.PopulateConfigFields();
         }
@@ -136,6 +153,7 @@ namespace Living_Room_PC_Utility
             comboBoxHdr.SelectedIndex = this.globalConfig.HDRSetting;
             comboBoxDolbyAtmos.SelectedIndex = this.globalConfig.AtmosSetting;
             comboBoxVolumeSwitching.SelectedIndex = this.globalConfig.VolumeSetting;
+            numericUpDownDefaultVolume.Value = this.globalConfig.DefaultVolumeSetting;
 
             this.buttonSaveConfig.Enabled = false;
             this.buttonCancelConfig.Enabled = false;
@@ -273,7 +291,7 @@ namespace Living_Room_PC_Utility
             }
         }
 
-        private void TrySetActiveProgramOnDemand()
+        public void TrySetActiveProgramOnDemand()
         {
 
             Process[] activeProcesses = Process.GetProcesses();
@@ -410,7 +428,9 @@ namespace Living_Room_PC_Utility
             }
 
             //if atmos is enabled
-            if (this.globalConfig.AtmosSetting > 0)
+            //only enable atmos if the program is at the highest supported global surround sound setting
+            //for example, if we have a 7.1 system and a 5.1 program, we do not enable atmos
+            if (this.globalConfig.AtmosSetting > 0 && programSurroundValue == this.globalConfig.SurroundSoundSetting)
             {
                 AudioSetter.SetAtmos(true);
             }
@@ -425,9 +445,13 @@ namespace Living_Room_PC_Utility
                 HDRController.SetGlobalHDRState(hdrState);
             }
 
-            if (this.globalConfig.VolumeSetting > 0)
+            if (this.globalConfig.VolumeSetting > 0) //volume switching is enabled in the global settings
             {
-                //TODO set volume
+                if(prog.VolumeSetting != "" && prog.VolumeSetting != "0") //program config has a volume setting
+                {
+                    VolumeSetter.SetReceiverVolume(Int32.Parse(prog.VolumeSetting));
+                }
+
             }
 
         }
@@ -589,7 +613,7 @@ namespace Living_Room_PC_Utility
             }
             base.OnFormClosing(e);
         }
-        
+
         private void IconClick(object sender, System.EventArgs e)
         {
             this.RestoreWindow(sender, e);
@@ -619,17 +643,30 @@ namespace Living_Room_PC_Utility
             this.buttonCancelConfig.Enabled = true;
         }
 
+        private void numericUpDownDefaultVolume_ValueChanged(object sender, EventArgs e)
+        {
+            this.buttonSaveConfig.Enabled = true;
+            this.buttonCancelConfig.Enabled = true;
+        }
+
         private void buttonSaveConfig_Click(object sender, EventArgs e)
         {
             this.buttonSaveConfig.Enabled = false;
             this.buttonCancelConfig.Enabled = false;
 
+            //convert from decimal to int
+            int defaultVolume = (int)numericUpDownDefaultVolume.Value;
+
             GlobalConfig.UpdateConfigFile(
                 comboBoxSurroundSound.SelectedIndex,
                 comboBoxDolbyAtmos.SelectedIndex,
                 comboBoxHdr.SelectedIndex,
-                comboBoxVolumeSwitching.SelectedIndex
+                comboBoxVolumeSwitching.SelectedIndex,
+                defaultVolume
                 );
+
+            //do a refresh in case the active settings need to change
+            TrySetActiveProgramOnDemand();
         }
 
         private void buttonCancelConfig_Click(object sender, EventArgs e)
@@ -658,7 +695,7 @@ namespace Living_Room_PC_Utility
 
         private void TestProgram(object sender, EventArgs e)
         {
-            this.RestoreWindow(null,null);
+            this.RestoreWindow(null, null);
             FormTest form2 = new FormTest(this);
             form2.Show();
             form2.SetIsTestingHdr(false);
@@ -686,5 +723,6 @@ namespace Living_Room_PC_Utility
             Debug.WriteLine($"----------getOpenPrograms()----------");
         }
 
+        
     }
 }

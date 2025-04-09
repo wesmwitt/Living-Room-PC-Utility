@@ -49,7 +49,10 @@
             testProgramToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
             openFileDialog1 = new OpenFileDialog();
+            labelDefaultVolume = new Label();
+            numericUpDownDefaultVolume = new NumericUpDown();
             menuStrip2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownDefaultVolume).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -247,11 +250,30 @@
             toolStripMenuItem1.Name = "toolStripMenuItem1";
             toolStripMenuItem1.Size = new Size(227, 4);
             // 
+            // labelDefaultVolume
+            // 
+            labelDefaultVolume.AutoSize = true;
+            labelDefaultVolume.Location = new Point(453, 295);
+            labelDefaultVolume.Name = "labelDefaultVolume";
+            labelDefaultVolume.Size = new Size(220, 25);
+            labelDefaultVolume.TabIndex = 33;
+            labelDefaultVolume.Text = "Default Volume (Desktop):";
+            // 
+            // numericUpDownDefaultVolume
+            // 
+            numericUpDownDefaultVolume.Location = new Point(453, 323);
+            numericUpDownDefaultVolume.Name = "numericUpDownDefaultVolume";
+            numericUpDownDefaultVolume.Size = new Size(180, 31);
+            numericUpDownDefaultVolume.TabIndex = 35;
+            numericUpDownDefaultVolume.ValueChanged += numericUpDownDefaultVolume_ValueChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(668, 455);
+            Controls.Add(numericUpDownDefaultVolume);
+            Controls.Add(labelDefaultVolume);
             Controls.Add(buttonCancelConfig);
             Controls.Add(buttonSaveConfig);
             Controls.Add(comboBoxVolumeSwitching);
@@ -275,6 +297,7 @@
             Resize += Form1_Resize;
             menuStrip2.ResumeLayout(false);
             menuStrip2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownDefaultVolume).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -300,5 +323,8 @@
         private ToolStripMenuItem testProgramToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem1;
         private OpenFileDialog openFileDialog1;
+        private Button button1;
+        private Label labelDefaultVolume;
+        private NumericUpDown numericUpDownDefaultVolume;
     }
 }
