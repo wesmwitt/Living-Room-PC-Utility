@@ -33,9 +33,7 @@ namespace Living_Room_PC_Utility
         public static async void SetReceiverVolume(int volume)
         {
 
-            //TODO TEST CODE REMOVE!!!!!!!!!!!
             Debug.WriteLine("SetReceiverVolume(): " + volume);
-            return;
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
