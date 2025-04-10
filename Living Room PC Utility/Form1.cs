@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System;
+using System.Windows.Forms;
 
 
 namespace Living_Room_PC_Utility
@@ -34,11 +35,16 @@ namespace Living_Room_PC_Utility
         private ManagementEventWatcher processStopWatcher;
         private HashSet<int> trackedProcesses = new HashSet<int>();
 
-        string[] processBlockList = ["svcl.exe", "svchost.exe", "taskhostw.exe", "msedgewebview2.exe", "conhost.exe", "backgroundTaskHost.exe", "RuntimeBroker.exe", "sppsvc.exe", "ROUTE.EXE",
+        string[] processBlockList = ["", "svcl.exe", "svchost.exe", "taskhostw.exe", "msedgewebview2.exe", "conhost.exe", "backgroundTaskHost.exe", "RuntimeBroker.exe", "sppsvc.exe", "ROUTE.EXE",
             "XboxPcTray.exe", "GameBar.exe", "XboxGameBarWidgets.exe", "GameBarFTServer.exe", "updater.exe", "dllhost.exe", "GameBarPresenceWriter.exe", "OAWrapper.exe",
             "StandardCollector.Service.exe", "steamwebhelper.exe", "consent.exe", "steamservice.exe", "cmd.exe", "SearchProtocolHost.exe", "SearchFilterHost.exe", "GameOverlayUI.exe",
             "CompPkgSrv.exe", "x64launcher.exe", "Living Room PC Utility.exe", "git.exe", "smartscreen.exe", "Taskmgr.exe", "WindowsPackageManagerServer.exe", "CompatTelRunner.exe",
-            "Living Room PC Utility.exe", "MoUsoCoreWorker.exe", "csc.exe", "cvtres.exe", "",
+            "Living Room PC Utility.exe", "MoUsoCoreWorker.exe", "csc.exe", "cvtres.exe", "WmiPrvSE.exe", "OfficeClickToRun.exe", "PerfBoost.exe", "AppVShNotify.exe", "Integrator.exe",
+            "SearchIndexer.exe", "wevtutil.exe", "rundll32.exe", "schtasks.exe", "msiexec.exe", "BackgroundDownload.exe", "OfficeC2RClient.exe", "SDXHelper.exe", "sdbinst.exe", "audiodg.exe",
+            "SystemSettings.exe", "nvngx_update.exe", "powershell.exe", "XboxPcApp.exe", "mmc.exe", "7zFM.exe", "setup.exe", "sc.exe", "NvOAWrapperCache.exe", "drvinst.exe", "nvcontainer.exe",
+            "NVIDIA App.exe", "nvcplui.exe", "OpenConsole.exe", "Time.exe", "Copilot.exe", "PilotshubApp.exe", "MicrosoftSecurityApp.exe", "SecHealthUI.exe", "python.exe",
+            "SecurityHealthHost.exe", "ms-teamsupdate.exe", "QuickAssist.exe", "PickerHost.exe", "SnippingTool.exe", "control.exe", "explorer.exe", "AppHostRegistrationVerifier.exe",
+            "WindowsBackupClient.exe", "crashpad_handler.exe", "GoogleDriveFS.exe", "osk.exe", "AsusUpdate.exe", "Get-AppxVersion.exe", "WebExperienceHostApp.exe"
         ];
 
         public Form1()
@@ -103,6 +109,13 @@ namespace Living_Room_PC_Utility
 
             //todo re-enbale
             this.ShowInTaskbar = false;
+
+            var recentPrograms = RecentPrograms.GetRecentProgramsDictionary();
+            Debug.WriteLine("Recent Programs:");
+            foreach (var item in recentPrograms)
+            {
+                Debug.WriteLine(item.Key + ": " + item.Value);
+            }
 
             this.Hide(); // Hide window when user tries to close it
         }
@@ -190,6 +203,9 @@ namespace Living_Room_PC_Utility
 
                 int processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
                 string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
+                //"ParentProcessID" is the other helpful attribute
+                int parentProcessId = Convert.ToInt32(e.NewEvent.Properties["ParentProcessID"].Value);
+
 
                 if (!processBlockList.Contains(processName))
                 {
@@ -199,6 +215,7 @@ namespace Living_Room_PC_Utility
                     {
                         string windowTitle = GetWindowTitle(processId);
                         Debug.WriteLine($"New Process Detected: {processName} - {windowTitle} - {processId}");
+                        RecentPrograms.AddRecentProgram(processName, windowTitle);
                         TrySetActiveProgram(processName, windowTitle, processId, this.programConfigs);
                     });
                 }
@@ -215,11 +232,12 @@ namespace Living_Room_PC_Utility
             try
             {
                 int processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
+                string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
 
                 if (trackedProcesses.Contains(processId))
                 {
                     trackedProcesses.Remove(processId);
-                    Debug.WriteLine($"Process Closed: PID {processId}");
+                    Debug.WriteLine($"Process Closed: {processName} - {processId}");
                     TryUnsetActiveProgram(processId);
                 }
             }
@@ -235,11 +253,7 @@ namespace Living_Room_PC_Utility
             {
 
                 Process process = Process.GetProcessById(processId);
-
-                if (process.ProcessName == "ApplicationFrameHost")
-                {
-                    return GetUWPWindowTitle(processId);
-                }
+                Debug.WriteLine("GetWindowTitle() pid: ", processId, "process found: ", process.ToString());
 
                 if (process.MainWindowHandle != IntPtr.Zero)
                 {
@@ -252,43 +266,6 @@ namespace Living_Room_PC_Utility
                 // Process might have exited
             }
             return string.Empty;
-        }
-
-        private string GetUWPWindowTitle(int parentProcessId)
-        {
-            foreach (Process process in Process.GetProcesses())
-            {
-                if (process.ProcessName != "ApplicationFrameHost" && process.MainWindowHandle != IntPtr.Zero)
-                //if (process.ProcessName == "ApplicationFrameHost" && process.MainWindowHandle != IntPtr.Zero)
-                {
-                    try
-                    {
-                        int parentId = GetParentProcessId(process.Id);
-                        if (parentId == parentProcessId)
-                        {
-                            return process.MainWindowTitle;
-                        }
-                    }
-                    catch { }
-                }
-            }
-            return "Unknown UWP App";
-        }
-
-        private int GetParentProcessId(int processId)
-        {
-            try
-            {
-                using (ManagementObject mo = new ManagementObject($"Win32_Process.Handle='{processId}'"))
-                {
-                    mo.Get();
-                    return Convert.ToInt32(mo["ParentProcessId"]);
-                }
-            }
-            catch
-            {
-                return -1;
-            }
         }
 
         public void TrySetActiveProgramOnDemand()
@@ -678,7 +655,7 @@ namespace Living_Room_PC_Utility
         private void Form1_Load(object sender, EventArgs e)
         {
             TrySetActiveProgramOnDemand();
-            this.getOpenPrograms();
+            //this.getOpenPrograms();
         }
 
         private void programListToolStripMenuItem_Click(object sender, EventArgs e)
@@ -711,6 +688,7 @@ namespace Living_Room_PC_Utility
             form2.startTestThread();
         }
 
+        //test code, not currently used
         private void getOpenPrograms()
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process");
