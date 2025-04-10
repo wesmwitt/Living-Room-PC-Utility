@@ -69,7 +69,7 @@
             dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersWidth = 72;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(832, 320);
+            dataGridView1.Size = new Size(981, 320);
             dataGridView1.TabIndex = 18;
             dataGridView1.SelectionChanged += DataGridView1_SelectionChanged;
             // 
@@ -142,7 +142,7 @@
             // buttonCancel
             // 
             buttonCancel.Enabled = false;
-            buttonCancel.Location = new Point(360, 688);
+            buttonCancel.Location = new Point(358, 592);
             buttonCancel.Margin = new Padding(2);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(109, 33);
@@ -154,7 +154,7 @@
             // buttonSave
             // 
             buttonSave.Enabled = false;
-            buttonSave.Location = new Point(246, 688);
+            buttonSave.Location = new Point(244, 592);
             buttonSave.Margin = new Padding(2);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(109, 33);
@@ -307,7 +307,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(854, 741);
+            ClientSize = new Size(1003, 657);
             Controls.Add(numericUpDownVolume);
             Controls.Add(labelVolume);
             Controls.Add(comboBoxDelayGlobal);
