@@ -131,14 +131,31 @@ namespace Living_Room_PC_Utility
             comboBoxSoundMode.Text = ProgramConfig.getFriendlyNameForSetting("SurroundSoundSetting", surroundFormatDetected.ToString());
 
 
-            Process[] activeProcesses = Process.GetProcesses();
-            foreach (var process in activeProcesses)
+            Dictionary<string, string> recentPrograms = RecentPrograms.GetRecentProgramsDictionary();
+            //Add recent programs in reverse order
+            int count = 0;
+            int maxPrograms = 50; //limit to 50 programs max
+            foreach (var prog in recentPrograms.Reverse())
             {
-                if (process.MainWindowTitle != "")
-                {   
-                    comboBoxProgram.Items.Add(process.ProcessName + ".exe");
-                    comboBoxProgram.Items.Add(process.MainWindowTitle);
+
+                if (count > maxPrograms)
+                {
+                    break;
                 }
+
+                //Add program name (.exe file) if it's not blank
+                if(prog.Key != "")
+                {
+                    comboBoxProgram.Items.Add(prog.Key);
+                }
+
+                //Add program title if it's not blank
+                if (prog.Value != "")
+                {   
+                    comboBoxProgram.Items.Add(prog.Value);
+                }
+                
+                count++;
             }
 
             labelResults.Text = "";
