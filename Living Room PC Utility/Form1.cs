@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System;
+using System.Windows.Forms;
 
 
 namespace Living_Room_PC_Utility
@@ -34,11 +35,16 @@ namespace Living_Room_PC_Utility
         private ManagementEventWatcher processStopWatcher;
         private HashSet<int> trackedProcesses = new HashSet<int>();
 
-        string[] processBlockList = ["svcl.exe", "svchost.exe", "taskhostw.exe", "msedgewebview2.exe", "conhost.exe", "backgroundTaskHost.exe", "RuntimeBroker.exe", "sppsvc.exe", "ROUTE.EXE",
+        string[] processBlockList = ["", "svcl.exe", "svchost.exe", "taskhostw.exe", "msedgewebview2.exe", "conhost.exe", "backgroundTaskHost.exe", "RuntimeBroker.exe", "sppsvc.exe", "ROUTE.EXE",
             "XboxPcTray.exe", "GameBar.exe", "XboxGameBarWidgets.exe", "GameBarFTServer.exe", "updater.exe", "dllhost.exe", "GameBarPresenceWriter.exe", "OAWrapper.exe",
             "StandardCollector.Service.exe", "steamwebhelper.exe", "consent.exe", "steamservice.exe", "cmd.exe", "SearchProtocolHost.exe", "SearchFilterHost.exe", "GameOverlayUI.exe",
             "CompPkgSrv.exe", "x64launcher.exe", "Living Room PC Utility.exe", "git.exe", "smartscreen.exe", "Taskmgr.exe", "WindowsPackageManagerServer.exe", "CompatTelRunner.exe",
-            "Living Room PC Utility.exe", "MoUsoCoreWorker.exe", "csc.exe", "cvtres.exe", "",
+            "Living Room PC Utility.exe", "MoUsoCoreWorker.exe", "csc.exe", "cvtres.exe", "WmiPrvSE.exe", "OfficeClickToRun.exe", "PerfBoost.exe", "AppVShNotify.exe", "Integrator.exe",
+            "SearchIndexer.exe", "wevtutil.exe", "rundll32.exe", "schtasks.exe", "msiexec.exe", "BackgroundDownload.exe", "OfficeC2RClient.exe", "SDXHelper.exe", "sdbinst.exe", "audiodg.exe",
+            "SystemSettings.exe", "nvngx_update.exe", "powershell.exe", "XboxPcApp.exe", "mmc.exe", "7zFM.exe", "setup.exe", "sc.exe", "NvOAWrapperCache.exe", "drvinst.exe", "nvcontainer.exe",
+            "NVIDIA App.exe", "nvcplui.exe", "OpenConsole.exe", "Time.exe", "Copilot.exe", "PilotshubApp.exe", "MicrosoftSecurityApp.exe", "SecHealthUI.exe", "python.exe",
+            "SecurityHealthHost.exe", "ms-teamsupdate.exe", "QuickAssist.exe", "PickerHost.exe", "SnippingTool.exe", "control.exe", "explorer.exe", "AppHostRegistrationVerifier.exe",
+            "WindowsBackupClient.exe", "crashpad_handler.exe", "GoogleDriveFS.exe", "osk.exe", "AsusUpdate.exe", "Get-AppxVersion.exe", "WebExperienceHostApp.exe"
         ];
 
         public Form1()
