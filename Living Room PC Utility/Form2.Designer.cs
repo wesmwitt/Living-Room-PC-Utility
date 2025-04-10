@@ -112,9 +112,9 @@
             labelProgram.Location = new Point(518, 27);
             labelProgram.Margin = new Padding(2, 0, 2, 0);
             labelProgram.Name = "labelProgram";
-            labelProgram.Size = new Size(85, 25);
+            labelProgram.Size = new Size(428, 25);
             labelProgram.TabIndex = 29;
-            labelProgram.Text = "Program:";
+            labelProgram.Text = "Program Name or Title (Using .exe name suggested):";
             // 
             // comboBoxSoundMode
             // 
