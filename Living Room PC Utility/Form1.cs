@@ -104,6 +104,13 @@ namespace Living_Room_PC_Utility
             //todo re-enbale
             this.ShowInTaskbar = false;
 
+            var recentPrograms = RecentPrograms.GetRecentProgramsDictionary();
+            Debug.WriteLine("Recent Programs:");
+            foreach (var item in recentPrograms)
+            {
+                Debug.WriteLine(item.Key + ": " + item.Value);
+            }
+
             this.Hide(); // Hide window when user tries to close it
         }
 
@@ -190,6 +197,9 @@ namespace Living_Room_PC_Utility
 
                 int processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
                 string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
+                //"ParentProcessID" is the other helpful attribute
+                int parentProcessId = Convert.ToInt32(e.NewEvent.Properties["ParentProcessID"].Value);
+
 
                 if (!processBlockList.Contains(processName))
                 {
@@ -199,6 +209,7 @@ namespace Living_Room_PC_Utility
                     {
                         string windowTitle = GetWindowTitle(processId);
                         Debug.WriteLine($"New Process Detected: {processName} - {windowTitle} - {processId}");
+                        RecentPrograms.AddRecentProgram(processName, windowTitle);
                         TrySetActiveProgram(processName, windowTitle, processId, this.programConfigs);
                     });
                 }
@@ -215,11 +226,12 @@ namespace Living_Room_PC_Utility
             try
             {
                 int processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
+                string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
 
                 if (trackedProcesses.Contains(processId))
                 {
                     trackedProcesses.Remove(processId);
-                    Debug.WriteLine($"Process Closed: PID {processId}");
+                    Debug.WriteLine($"Process Closed: {processName} - {processId}");
                     TryUnsetActiveProgram(processId);
                 }
             }
@@ -235,11 +247,7 @@ namespace Living_Room_PC_Utility
             {
 
                 Process process = Process.GetProcessById(processId);
-
-                if (process.ProcessName == "ApplicationFrameHost")
-                {
-                    return GetUWPWindowTitle(processId);
-                }
+                Debug.WriteLine("GetWindowTitle() pid: ", processId, "process found: ", process.ToString());
 
                 if (process.MainWindowHandle != IntPtr.Zero)
                 {
@@ -252,43 +260,6 @@ namespace Living_Room_PC_Utility
                 // Process might have exited
             }
             return string.Empty;
-        }
-
-        private string GetUWPWindowTitle(int parentProcessId)
-        {
-            foreach (Process process in Process.GetProcesses())
-            {
-                if (process.ProcessName != "ApplicationFrameHost" && process.MainWindowHandle != IntPtr.Zero)
-                //if (process.ProcessName == "ApplicationFrameHost" && process.MainWindowHandle != IntPtr.Zero)
-                {
-                    try
-                    {
-                        int parentId = GetParentProcessId(process.Id);
-                        if (parentId == parentProcessId)
-                        {
-                            return process.MainWindowTitle;
-                        }
-                    }
-                    catch { }
-                }
-            }
-            return "Unknown UWP App";
-        }
-
-        private int GetParentProcessId(int processId)
-        {
-            try
-            {
-                using (ManagementObject mo = new ManagementObject($"Win32_Process.Handle='{processId}'"))
-                {
-                    mo.Get();
-                    return Convert.ToInt32(mo["ParentProcessId"]);
-                }
-            }
-            catch
-            {
-                return -1;
-            }
         }
 
         public void TrySetActiveProgramOnDemand()
@@ -678,7 +649,7 @@ namespace Living_Room_PC_Utility
         private void Form1_Load(object sender, EventArgs e)
         {
             TrySetActiveProgramOnDemand();
-            this.getOpenPrograms();
+            //this.getOpenPrograms();
         }
 
         private void programListToolStripMenuItem_Click(object sender, EventArgs e)
@@ -711,6 +682,7 @@ namespace Living_Room_PC_Utility
             form2.startTestThread();
         }
 
+        //test code, not currently used
         private void getOpenPrograms()
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process");
