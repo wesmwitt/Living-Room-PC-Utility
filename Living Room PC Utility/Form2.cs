@@ -189,6 +189,7 @@ namespace Living_Room_PC_Utility
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             detector.StopDetection();
+            parentForm.TrySetActiveProgramOnDemand();
             base.OnFormClosing(e);
         }
 

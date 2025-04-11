@@ -267,6 +267,8 @@ namespace Living_Room_PC_Utility
         public void TrySetActiveProgramOnDemand()
         {
 
+            bool hasActiveProgram = false;
+
             Process[] activeProcesses = Process.GetProcesses();
 
             foreach (Process activeProcess in activeProcesses)
@@ -288,6 +290,9 @@ namespace Living_Room_PC_Utility
 
                 if (hasConfigByExe || hasConfigByTitle)
                 {
+
+                    hasActiveProgram = true;
+
                     //set pid
                     this.activeProgramPID = activeProcess.Id;
                     this.trackedProcesses.Add(activeProcess.Id);
@@ -308,7 +313,18 @@ namespace Living_Room_PC_Utility
 
             }
 
-            //TODO if we don't have a program, set the default settings
+            //if we don't have a program, set the default settings
+            if (!hasActiveProgram)
+            {
+                this.activeProgramPID = 0;
+                this.activeProgramStr = "";
+                this.SetDefaultSoundDisplaySettings();
+                label2.Invoke((Action)delegate
+                {
+                    label2.Text = "";
+                });
+                this.ShowProgramStatusBaloon(false);
+            }
 
         }
 
@@ -514,6 +530,16 @@ namespace Living_Room_PC_Utility
             return new KeyValuePair<string, ProgramConfig>("", new ProgramConfig()); //nothing found
         }
 
+        public void ShowProgramStatusBaloon(bool openStatus)
+        {
+            string status = (openStatus) ? "Configured process open" : "No configured process open";
+            string settingChange = (openStatus) ? "Adjusting settings accordingly." : "Restoring default settings.";
+            trayIcon.BalloonTipTitle = $"{status}";
+            trayIcon.BalloonTipText = $"{settingChange}";
+            trayIcon.ShowBalloonTip(1000);
+
+        }
+        
         public void ShowProgramStatusBaloon(bool openStatus, string process)
         {
             string status = (openStatus) ? "opened" : "closed";
