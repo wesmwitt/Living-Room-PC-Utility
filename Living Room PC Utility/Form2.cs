@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using AutoActions.Displays;
-using IniParser;
 using IniParser.Model;
 
 namespace Living_Room_PC_Utility
@@ -10,7 +9,6 @@ namespace Living_Room_PC_Utility
         private SurroundSoundDetector detector = new SurroundSoundDetector();
         private Dictionary<string, bool> results;
         private int surroundFormatDetected = -1;
-        FileIniDataParser parser = new FileIniDataParser();
         bool isTestingHdr = false;
         Form1 parentForm;
 
@@ -93,10 +91,8 @@ namespace Living_Room_PC_Utility
         private void startTest()
         {
 
-
-            //TODO set surround to max level
-            IniData config = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\Config.ini"));
-            AudioSetter.SetSurround(Int32.Parse(config["Settings"]["surroundType"]));
+            GlobalConfig globalConfig = GlobalConfig.GetGlobalConfigFileData();
+            AudioSetter.SetSurround(globalConfig.SurroundSoundSetting);
 
             //Set HDR if needed
             if (this.isTestingHdr)
@@ -129,7 +125,6 @@ namespace Living_Room_PC_Utility
 
             int surroundFormatDetected = this.calculateSurroundFormat(results);
             comboBoxSoundMode.Text = ProgramConfig.getFriendlyNameForSetting("SurroundSoundSetting", surroundFormatDetected.ToString());
-
 
             Dictionary<string, string> recentPrograms = RecentPrograms.GetRecentProgramsDictionary();
             //Add recent programs in reverse order
@@ -201,8 +196,7 @@ namespace Living_Room_PC_Utility
         private void buttonSave_Click(object sender, EventArgs e)
         {
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), @"data\ProgramConfigListUser.ini");
-            IniData programConfigListUser = parser.ReadFile(path);
+            IniData programConfigListUser = IniHelper.GetIniFileData(IniNames.ProgramConfigListUser);
 
             string selectedProgram = comboBoxProgram.SelectedItem.ToString();
             string selectedSurround = comboBoxSoundMode.SelectedItem.ToString();
@@ -225,11 +219,15 @@ namespace Living_Room_PC_Utility
                     tempProgConfig.HDRSetting = ProgramConfig.getSettingForFriendlyName("HDRSetting", hdrSetting.ToString());
                 }
 
+                //todo save delay and volume?
+
                 string title = "Saving program: " + selectedProgram + ".";
                 string text = tempProgConfig.toFriendlyStringConcise();
                 parentForm.ShowBaloonTip(title, text);
 
                 ProgramConfig.UpdateProgramConfigListUser(selectedProgram, tempProgConfig);
+
+                //todo refresh? //todo what do to if program is no longer found? 
                 
             }
 
