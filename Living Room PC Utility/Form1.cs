@@ -40,7 +40,14 @@ namespace Living_Room_PC_Utility
             "SystemSettings.exe", "nvngx_update.exe", "powershell.exe", "XboxPcApp.exe", "mmc.exe", "7zFM.exe", "setup.exe", "sc.exe", "NvOAWrapperCache.exe", "drvinst.exe", "nvcontainer.exe",
             "NVIDIA App.exe", "nvcplui.exe", "OpenConsole.exe", "Time.exe", "Copilot.exe", "PilotshubApp.exe", "MicrosoftSecurityApp.exe", "SecHealthUI.exe", "python.exe",
             "SecurityHealthHost.exe", "ms-teamsupdate.exe", "QuickAssist.exe", "PickerHost.exe", "SnippingTool.exe", "control.exe", "explorer.exe", "AppHostRegistrationVerifier.exe",
-            "WindowsBackupClient.exe", "crashpad_handler.exe", "GoogleDriveFS.exe", "osk.exe", "AsusUpdate.exe", "Get-AppxVersion.exe", "WebExperienceHostApp.exe"
+            "WindowsBackupClient.exe", "crashpad_handler.exe", "GoogleDriveFS.exe", "osk.exe", "AsusUpdate.exe", "Get-AppxVersion.exe", "WebExperienceHostApp.exe", "git-remote-https.exe", 
+            "git-credential-manager.exe", "sh.exe", "VSSVC.exe", "SrTasks.exe", "tzsync.exe", "UsoClient.exe", "dmclient.exe", "UCPDMgr.exe", "mscorsvw.exe", "ngen.exe", "DismHost.exe", 
+            "DataExchangeHost.exe", "ShellHost.exe", "WindowsTerminal.exe", "UbisoftExtension.exe", "EAConnect_microsoft.exe", "upc.exe", "UplayService.exe", "UplayWebCore.exe", 
+            "EACefSubProcess.exe", "MicrosoftEdge_X64_135.0.3179.66_135.0.3179.54.exe", "BackgroundTransferHost.exe", "pingsender.exe", "upfc.exe", "SpatialAudioLicenseSrv.exe", "TiWorker.exe", 
+            "LogiOverlay.exe", "AutoHotkey64.exe", "SIHClient.exe", "UCConfigTask.exe", "wuaucltcore.exe", "wsqmcons.exe", "curl.exe", "AutoHotkeyU64.exe", "USBDeview.exe", "AutoHotkeyUX.exe", 
+            "wscript.exe", "dxgiadaptercache.exe", "WMIADAP.exe", "ngen.exe", "APSDaemon.exe", "taskkill.exe", "mscorsvw.exe", "MoNotificationUx.exe", "UIEOrchestrator.exe", "NZXT CAM.exe", 
+            "EasyAntiCheat_EOS.exe", "ShellExperienceHost.exe", "CrashReportClient.exe", "MpCmdRun.exe", "MpSigStub.exe", "LogiLuUpdater.exe", "UsoClient.exe", "TrustedInstaller.exe", "dmclient.exe", 
+            "MicrosoftEdgeUpdate.exe", "wermgr.exe", "EpicWebHelper.exe", "iCloudFirefox.exe", "chrome_proxy.exe", "NgcIso.exe", "provtool.exe", "Defrag.exe", "EpicGamesUpdater.exe", "DeviceCensus.exe"
         ];
 
         public Form1()
