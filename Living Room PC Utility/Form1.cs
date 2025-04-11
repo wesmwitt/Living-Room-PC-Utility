@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using IniParser;
 using IniParser.Model;
 using NAudio.CoreAudioApi;
 using AutoActions.Displays;
@@ -23,10 +22,7 @@ namespace Living_Room_PC_Utility
         private int activeProgramPID = 0;
         private string activeProgramStr = "";
 
-        private IniData configIni;
         private GlobalConfig globalConfig = new GlobalConfig();
-
-        FileIniDataParser parser = new FileIniDataParser();
 
         private Dictionary<string, ProgramConfig> programConfigs = new Dictionary<string, ProgramConfig>();
         private string audioDeviceName = "";
@@ -150,14 +146,7 @@ namespace Living_Room_PC_Utility
 
         private void ProcessGlobalConfig()
         {
-            this.configIni = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\Config.ini"));
-            this.globalConfig = new GlobalConfig(
-                configIni["Settings"]["surroundType"],
-                configIni["Settings"]["hdr"],
-                configIni["Settings"]["atmos"],
-                configIni["Settings"]["volume"],
-                configIni["Settings"]["defaultVolume"]
-                );
+            this.globalConfig = GlobalConfig.GetGlobalConfigFileData();
             this.PopulateConfigFields();
         }
         private void PopulateConfigFields()
@@ -311,6 +300,8 @@ namespace Living_Room_PC_Utility
                 }
 
             }
+
+            //TODO if we don't have a program, set the default settings
 
         }
 
@@ -634,7 +625,7 @@ namespace Living_Room_PC_Utility
             //convert from decimal to int
             int defaultVolume = (int)numericUpDownDefaultVolume.Value;
 
-            GlobalConfig.UpdateConfigFile(
+            GlobalConfig.SetGlobalConfigFileData(
                 comboBoxSurroundSound.SelectedIndex,
                 comboBoxDolbyAtmos.SelectedIndex,
                 comboBoxHdr.SelectedIndex,

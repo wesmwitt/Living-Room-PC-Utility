@@ -1,6 +1,4 @@
-﻿using IniParser;
-using IniParser.Model;
-
+﻿using IniParser.Model;
 
 namespace Living_Room_PC_Utility
 {
@@ -198,21 +196,19 @@ namespace Living_Room_PC_Utility
             return "-1";
         }
 
-
-        //private Dictionary<string, ProgramConfig> programConfigs = new Dictionary<string, ProgramConfig>();
-
-        public static Dictionary<string, ProgramConfig> GetProgramConfigDictionary(string dict)
+        public static Dictionary<string, ProgramConfig> GetProgramConfigDictionary(string configType)
         {
-            var parser = new FileIniDataParser();
-            
+
             IniData programConfigData = new IniData();
-            if (dict == "global"){
-                programConfigData = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\ProgramConfigListGlobal.ini"));
-            }else if (dict == "user"){
-                programConfigData = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\ProgramConfigListUser.ini"));
-            }else if (dict == "both"){
-                programConfigData = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\ProgramConfigListGlobal.ini"));
-                var userConfigData = parser.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), @"data\ProgramConfigListUser.ini"));
+            if (configType == "global"){
+                programConfigData = IniHelper.GetIniFileData(IniNames.ProgramConfigListGlobal);
+            }
+            else if (configType == "user"){
+                programConfigData = IniHelper.GetIniFileData(IniNames.ProgramConfigListUser);
+            }
+            else if (configType == "both"){
+                programConfigData = IniHelper.GetIniFileData(IniNames.ProgramConfigListGlobal);
+                var userConfigData = IniHelper.GetIniFileData(IniNames.ProgramConfigListUser);
                 programConfigData.Merge(userConfigData);
             }
 
@@ -222,11 +218,6 @@ namespace Living_Room_PC_Utility
             {
                 foreach (var item in programConfigData[section.SectionName])
                 {
-
-                    //if(item.KeyName == "SurroundSoundSetting")
-                    //{
-                    //    var temp = 0;
-                    //}
 
                     ProgramConfig tempProgConfig;
                     bool hasConfig = programConfigs.TryGetValue(item.KeyName, out tempProgConfig);
@@ -250,29 +241,27 @@ namespace Living_Room_PC_Utility
 
         public static void UpdateProgramConfigListUser(string name, ProgramConfig programConfig)
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), @"data\ProgramConfigListUser.ini");
-            var parser = new FileIniDataParser();
-            IniData programConfigListUser = parser.ReadFile(path);
-            var programConfigListUserDictionary = GetProgramConfigDictionary("user");
+            IniData data = IniHelper.GetIniFileData(IniNames.ProgramConfigListUser);
 
-            foreach (var section in programConfigListUser.Sections)
+            foreach (var section in data.Sections)
             {
                 foreach(var property in programConfig.toDictionary())
                 {
                     if(programConfig.getValue(section.SectionName) == "")
                     {
                         //delete key
-                        programConfigListUser[section.SectionName].RemoveKey(name);
+                        data[section.SectionName].RemoveKey(name);
                     }
                     else
                     {
                         //add key
-                        programConfigListUser[section.SectionName][name] = programConfig.getValue(section.SectionName);
+                        data[section.SectionName][name] = programConfig.getValue(section.SectionName);
                     }
 
                 }
             }
-                parser.WriteFile(path, programConfigListUser);
+            
+            IniHelper.SetIniFileData(IniNames.ProgramConfigListUser, data);
         }
 
     }

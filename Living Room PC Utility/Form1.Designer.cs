@@ -100,9 +100,9 @@
             label5.Location = new Point(247, 82);
             label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
-            label5.Size = new Size(328, 55);
+            label5.Size = new Size(192, 55);
             label5.TabIndex = 19;
-            label5.Text = "Global Settings:";
+            label5.Text = "Settings:";
             // 
             // label7
             // 
