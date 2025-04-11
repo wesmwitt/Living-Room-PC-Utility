@@ -1,5 +1,4 @@
-﻿using IniParser;
-using IniParser.Model;
+﻿using IniParser.Model;
 
 namespace Living_Room_PC_Utility
 {
@@ -7,7 +6,6 @@ namespace Living_Room_PC_Utility
     {
 
         private static string iniSectionName = "RecentPrograms";
-        private static string filePath = @"data\RecentProgramList.ini";
 
         public static Dictionary<string, string> GetRecentProgramsDictionary()
         {
@@ -26,43 +24,14 @@ namespace Living_Room_PC_Utility
 
         public static IniData GetRecentPrograms()
         {
-
-            // Load the INI file
-            FileIniDataParser parser = new FileIniDataParser();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), filePath);
-            IniData data = new IniData();
-
-            bool fileRead = false;
-            int retryCount = 0;
-            while (!fileRead && retryCount < 5)
-            {
-                try
-                {
-                    data = parser.ReadFile(path);
-                    fileRead = true;
-                }
-                catch (IOException)
-                {
-                    retryCount++;
-                    Thread.Sleep(100); // Wait for 100ms before retrying
-                }
-            }
-
-            if (!fileRead)
-            {
-                throw new IOException("Failed to read the file after multiple attempts.");
-            }
-
-            return data;
+            return IniHelper.GetIniFileData(IniNames.RecentProgramList);
         }
 
         //Requires special logic to add to the bottom of the 
         public static void AddRecentProgram(string name, string title)
         {
-            FileIniDataParser parser = new FileIniDataParser();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), filePath);
-            var data = GetRecentPrograms();
 
+            var data = GetRecentPrograms();
 
             // Create a new section to reorder keys
             var newSection = new SectionData(iniSectionName);
@@ -83,29 +52,8 @@ namespace Living_Room_PC_Utility
             data.Sections.RemoveSection(iniSectionName);
             data.Sections.Add(newSection);
 
-
-            bool fileWritten = false;
-            int retryCount = 0;
-            while (!fileWritten && retryCount < 5)
-            {
-                try
-                {
-                    parser.WriteFile(path, data);
-                    fileWritten = true;
-                }
-                catch (IOException)
-                {
-                    retryCount++;
-                    Thread.Sleep(100); // Wait for 100ms before retrying
-                }
-            }
-
-            if (!fileWritten)
-            {
-                throw new IOException("Failed to write to the file after multiple attempts.");
-            }
+            IniHelper.SetIniFileData(IniNames.RecentProgramList, data);
         }
-
 
     }
 
