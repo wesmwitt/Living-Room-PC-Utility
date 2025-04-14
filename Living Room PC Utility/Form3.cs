@@ -185,7 +185,7 @@ namespace Living_Room_PC_Utility
                 var volumeSetting = numericUpDownVolume.Value;
                 if(volumeSetting != 0)
                 {
-                    tempProgConfig.VolumeSetting = ""+volumeSetting;
+                    tempProgConfig.VolumeSetting = volumeSetting.ToString();
                 }
 
                 ProgramConfig.UpdateProgramConfigListUser(selectedProgram, tempProgConfig);
