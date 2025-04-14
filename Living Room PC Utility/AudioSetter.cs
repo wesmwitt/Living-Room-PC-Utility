@@ -11,7 +11,6 @@ namespace Living_Room_PC_Utility
         public static void SetSurround(int settingNum=0)
         {
 
-
             string audioDeviceName = GetAudioDevice();
             string path = Path.Combine(Directory.GetCurrentDirectory(), @"resources\programs\svcl.exe");
 
@@ -35,10 +34,7 @@ namespace Living_Room_PC_Utility
                 WindowStyle = ProcessWindowStyle.Hidden // Start hidden
             };
 
-            Process process = Process.Start(startInfo);
-
-            //System.Diagnostics.Process.Start(path, command);
-
+            Process.Start(startInfo);
         }
 
         public static void SetAtmos(bool enable=false)
@@ -65,9 +61,11 @@ namespace Living_Room_PC_Utility
                 WindowStyle = ProcessWindowStyle.Hidden // Start hidden
             };
 
-            Process process = Process.Start(startInfo);
+            Process.Start(startInfo);
 
-            //System.Diagnostics.Process.Start(path, command);
+            //run it again after a slight delay to make sure it takes effect
+            Thread.Sleep(50);
+            Process.Start(startInfo);
         }
 
         public static string GetAudioDevice()

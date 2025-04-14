@@ -92,7 +92,15 @@ namespace Living_Room_PC_Utility
         {
 
             GlobalConfig globalConfig = GlobalConfig.GetGlobalConfigFileData();
+
+            //Set the surround sound setting to the highest the PC can support
             AudioSetter.SetSurround(globalConfig.SurroundSoundSetting);
+
+            //if the PC supports Atmos, set it
+            if (globalConfig.AtmosSetting > 0)
+            {
+                AudioSetter.SetAtmos(true);
+            }
 
             //Set HDR if needed
             if (this.isTestingHdr)
