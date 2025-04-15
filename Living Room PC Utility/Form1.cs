@@ -101,7 +101,7 @@ namespace Living_Room_PC_Utility
 
             this.ProcessGlobalConfig();
 
-            this.label4.Text = AudioSetter.GetAudioDevice();
+            this.labelCurrentAudioDevice.Text = AudioSetter.GetAudioDevice();
 
             StartProcessMonitoring();
 
@@ -438,6 +438,7 @@ namespace Living_Room_PC_Utility
 
         public void SetSoundDisplaySettingsForProgramConfig(ProgramConfig prog)
         {
+            UpdateCurrentAudioDevice();
 
             int programSurroundValue = Int32.Parse(prog.SurroundSoundSetting);
             //if surround sound switching is enabled
@@ -481,6 +482,21 @@ namespace Living_Room_PC_Utility
 
             RunStartupScript();
 
+        }
+
+        private void UpdateCurrentAudioDevice()
+        {
+            if (this.labelCurrentAudioDevice.InvokeRequired)
+            {
+                this.labelCurrentAudioDevice.Invoke((Action)delegate
+                {
+                    this.labelCurrentAudioDevice.Text = AudioSetter.GetAudioDevice();
+                });
+            }
+            else
+            {
+                this.labelCurrentAudioDevice.Text = AudioSetter.GetAudioDevice();
+            }
         }
 
         private void RunStartupScript()
