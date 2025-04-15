@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System;
 using System.Windows.Forms;
+using TextBox = System.Windows.Forms.TextBox;
 
 
 namespace Living_Room_PC_Utility
@@ -40,19 +41,19 @@ namespace Living_Room_PC_Utility
             "SystemSettings.exe", "nvngx_update.exe", "powershell.exe", "XboxPcApp.exe", "mmc.exe", "7zFM.exe", "setup.exe", "sc.exe", "NvOAWrapperCache.exe", "drvinst.exe", "nvcontainer.exe",
             "NVIDIA App.exe", "nvcplui.exe", "OpenConsole.exe", "Time.exe", "Copilot.exe", "PilotshubApp.exe", "MicrosoftSecurityApp.exe", "SecHealthUI.exe", "python.exe",
             "SecurityHealthHost.exe", "ms-teamsupdate.exe", "QuickAssist.exe", "PickerHost.exe", "SnippingTool.exe", "control.exe", "explorer.exe", "AppHostRegistrationVerifier.exe",
-            "WindowsBackupClient.exe", "crashpad_handler.exe", "GoogleDriveFS.exe", "osk.exe", "AsusUpdate.exe", "Get-AppxVersion.exe", "WebExperienceHostApp.exe", "git-remote-https.exe", 
-            "git-credential-manager.exe", "sh.exe", "VSSVC.exe", "SrTasks.exe", "tzsync.exe", "UsoClient.exe", "dmclient.exe", "UCPDMgr.exe", "mscorsvw.exe", "ngen.exe", "DismHost.exe", 
-            "DataExchangeHost.exe", "ShellHost.exe", "WindowsTerminal.exe", "UbisoftExtension.exe", "EAConnect_microsoft.exe", "upc.exe", "UplayService.exe", "UplayWebCore.exe", 
-            "EACefSubProcess.exe", "MicrosoftEdge_X64_135.0.3179.66_135.0.3179.54.exe", "BackgroundTransferHost.exe", "pingsender.exe", "upfc.exe", "SpatialAudioLicenseSrv.exe", "TiWorker.exe", 
-            "LogiOverlay.exe", "AutoHotkey64.exe", "SIHClient.exe", "UCConfigTask.exe", "wuaucltcore.exe", "wsqmcons.exe", "curl.exe", "AutoHotkeyU64.exe", "USBDeview.exe", "AutoHotkeyUX.exe", 
-            "wscript.exe", "dxgiadaptercache.exe", "WMIADAP.exe", "ngen.exe", "APSDaemon.exe", "taskkill.exe", "mscorsvw.exe", "MoNotificationUx.exe", "UIEOrchestrator.exe", "NZXT CAM.exe", 
-            "EasyAntiCheat_EOS.exe", "ShellExperienceHost.exe", "CrashReportClient.exe", "MpCmdRun.exe", "MpSigStub.exe", "LogiLuUpdater.exe", "UsoClient.exe", "TrustedInstaller.exe", "dmclient.exe", 
+            "WindowsBackupClient.exe", "crashpad_handler.exe", "GoogleDriveFS.exe", "osk.exe", "AsusUpdate.exe", "Get-AppxVersion.exe", "WebExperienceHostApp.exe", "git-remote-https.exe",
+            "git-credential-manager.exe", "sh.exe", "VSSVC.exe", "SrTasks.exe", "tzsync.exe", "UsoClient.exe", "dmclient.exe", "UCPDMgr.exe", "mscorsvw.exe", "ngen.exe", "DismHost.exe",
+            "DataExchangeHost.exe", "ShellHost.exe", "WindowsTerminal.exe", "UbisoftExtension.exe", "EAConnect_microsoft.exe", "upc.exe", "UplayService.exe", "UplayWebCore.exe",
+            "EACefSubProcess.exe", "MicrosoftEdge_X64_135.0.3179.66_135.0.3179.54.exe", "BackgroundTransferHost.exe", "pingsender.exe", "upfc.exe", "SpatialAudioLicenseSrv.exe", "TiWorker.exe",
+            "LogiOverlay.exe", "AutoHotkey64.exe", "SIHClient.exe", "UCConfigTask.exe", "wuaucltcore.exe", "wsqmcons.exe", "curl.exe", "AutoHotkeyU64.exe", "USBDeview.exe", "AutoHotkeyUX.exe",
+            "wscript.exe", "dxgiadaptercache.exe", "WMIADAP.exe", "ngen.exe", "APSDaemon.exe", "taskkill.exe", "mscorsvw.exe", "MoNotificationUx.exe", "UIEOrchestrator.exe", "NZXT CAM.exe",
+            "EasyAntiCheat_EOS.exe", "ShellExperienceHost.exe", "CrashReportClient.exe", "MpCmdRun.exe", "MpSigStub.exe", "LogiLuUpdater.exe", "UsoClient.exe", "TrustedInstaller.exe", "dmclient.exe",
             "MicrosoftEdgeUpdate.exe", "wermgr.exe", "EpicWebHelper.exe", "iCloudFirefox.exe", "chrome_proxy.exe", "NgcIso.exe", "provtool.exe", "Defrag.exe", "EpicGamesUpdater.exe", "DeviceCensus.exe",
-            "bootstrapper.exe", "dxdiag.exe", "codCrashHandler.exe", "WmiApSrv.exe", "elevation_service.exe", "inno_updater.exe", "remoting_native_messaging_host.exe", "EALaunchHelper.exe", 
-            "EALocalHostSvc.exe", "IGOProxy32.exe", "EAAntiCheat.Installer.exe", "EAAntiCheat.GameService.dll", "EAAntiCheat.GameService.exe", "OpenWith.exe", "AM_Delta_Patch_1.427.205.0.exe", 
-            "makecab.exe", "UpdaterSetup.exe", "qualification_app.exe", "PING.EXE", "ControllerCompanion.exe", "default-browser-agent.exe", "WaaSMedicAgent.exe", "gifsicle.exe", "dbInstaller.exe", 
-            "appidcertstorecheck.exe", "TcNo-Acc-Switcher.exe", "TcNo-Acc-Switcher_main.exe", "opushutil.exe", "runas.exe", "WerFault.exe", "SpeechModelDownload.exe", "DiskSnapshot.exe", "dstokenclean.exe", 
-            "cleanmgr.exe", "ngentask.exe", "reg.exe"
+            "bootstrapper.exe", "dxdiag.exe", "codCrashHandler.exe", "WmiApSrv.exe", "elevation_service.exe", "inno_updater.exe", "remoting_native_messaging_host.exe", "EALaunchHelper.exe",
+            "EALocalHostSvc.exe", "IGOProxy32.exe", "EAAntiCheat.Installer.exe", "EAAntiCheat.GameService.dll", "EAAntiCheat.GameService.exe", "OpenWith.exe", "AM_Delta_Patch_1.427.205.0.exe",
+            "makecab.exe", "UpdaterSetup.exe", "qualification_app.exe", "PING.EXE", "ControllerCompanion.exe", "default-browser-agent.exe", "WaaSMedicAgent.exe", "gifsicle.exe", "dbInstaller.exe",
+            "appidcertstorecheck.exe", "TcNo-Acc-Switcher.exe", "TcNo-Acc-Switcher_main.exe", "opushutil.exe", "runas.exe", "WerFault.exe", "SpeechModelDownload.exe", "DiskSnapshot.exe", "dstokenclean.exe",
+            "cleanmgr.exe", "ngentask.exe", "reg.exe", "doff.exe", "identity_helper.exe", "code-tunnel.exe", "wsl.exe", "icacls.exe", "DesignToolsServer.exe"
         ];
 
         public Form1()
@@ -140,20 +141,21 @@ namespace Living_Room_PC_Utility
                 AudioSetter.SetSurround(0);
             }
 
-            if(this.globalConfig.AtmosSetting > 0)
+            if (this.globalConfig.AtmosSetting > 0)
             {
                 AudioSetter.SetAtmos(false);
             }
 
-            if(this.globalConfig.HDRSetting > 0)
+            if (this.globalConfig.HDRSetting > 0)
             {
                 HDRController.SetGlobalHDRState(false);
             }
 
-            if(this.globalConfig.VolumeSetting > 0)
+            if (this.globalConfig.VolumeSetting > 0)
             {
                 VolumeSetter.SetReceiverVolume(this.globalConfig.DefaultVolumeSetting);
             }
+
         }
 
         private void ProcessGlobalConfig()
@@ -168,6 +170,8 @@ namespace Living_Room_PC_Utility
             comboBoxDolbyAtmos.SelectedIndex = this.globalConfig.AtmosSetting;
             comboBoxVolumeSwitching.SelectedIndex = this.globalConfig.VolumeSetting;
             numericUpDownDefaultVolume.Value = this.globalConfig.DefaultVolumeSetting;
+            textBoxStartupScript.Text = this.globalConfig.StartupScript;
+            textBoxShutdownScript.Text = this.globalConfig.ShutdownScript;
 
             this.buttonSaveConfig.Enabled = false;
             this.buttonCancelConfig.Enabled = false;
@@ -399,11 +403,36 @@ namespace Living_Room_PC_Utility
                 ShowProgramStatusBaloon(false, this.activeProgramStr);
                 this.activeProgramPID = 0;
                 this.activeProgramStr = "";
+                RunShutdownScript();
+
                 this.SetDefaultSoundDisplaySettings();
                 label2.Invoke((Action)delegate
                 {
                     label2.Text = "";
                 });
+            }
+        }
+
+        private void RunShutdownScript()
+        {
+            if (this.globalConfig.ShutdownScript != "")
+            {
+                // Run startup script with the default associated application
+                Debug.WriteLine("Has startup script.");
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = this.globalConfig.ShutdownScript;
+                startInfo.UseShellExecute = true; // Use the default application
+
+                try
+                {
+                    Process.Start(startInfo);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to start process: {ex.Message}");
+                    // Optionally, you can show a message box or log the error
+                    MessageBox.Show($"Failed to start process: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -443,16 +472,39 @@ namespace Living_Room_PC_Utility
 
             if (this.globalConfig.VolumeSetting > 0) //volume switching is enabled in the global settings
             {
-                if(prog.VolumeSetting != "" && prog.VolumeSetting != "0") //program config has a volume setting
+                if (prog.VolumeSetting != "" && prog.VolumeSetting != "0") //program config has a volume setting
                 {
                     VolumeSetter.SetReceiverVolume(Int32.Parse(prog.VolumeSetting));
                 }
 
             }
 
+            RunStartupScript();
+
         }
 
+        private void RunStartupScript()
+        {
+            if (this.globalConfig.StartupScript != "")
+            {
+                // Run startup script with the default associated application
+                Debug.WriteLine("Has startup script.");
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = this.globalConfig.StartupScript;
+                startInfo.UseShellExecute = true; // Use the default application
 
+                try
+                {
+                    Process.Start(startInfo);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to start process: {ex.Message}");
+                    // Optionally, you can show a message box or log the error
+                    MessageBox.Show($"Failed to start process: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
 
         //-------------------------------------------
 
@@ -544,7 +596,7 @@ namespace Living_Room_PC_Utility
             trayIcon.ShowBalloonTip(1000);
 
         }
-        
+
         public void ShowProgramStatusBaloon(bool openStatus, string process)
         {
             string status = (openStatus) ? "opened" : "closed";
@@ -668,8 +720,12 @@ namespace Living_Room_PC_Utility
                 comboBoxDolbyAtmos.SelectedIndex,
                 comboBoxHdr.SelectedIndex,
                 comboBoxVolumeSwitching.SelectedIndex,
-                defaultVolume
+                defaultVolume,
+                textBoxStartupScript.Text,
+                textBoxShutdownScript.Text
                 );
+
+            ProcessGlobalConfig();
 
             //do a refresh in case the active settings need to change
             TrySetActiveProgramOnDemand();
@@ -730,6 +786,39 @@ namespace Living_Room_PC_Utility
             Debug.WriteLine($"----------getOpenPrograms()----------");
         }
 
-        
+        private void buttonStartupScript_Click(object sender, EventArgs e)
+        {
+            SelectFile(textBoxStartupScript);
+        }
+
+        private void textBoxStartupScript_TextChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine("textBoxStartupScript_TextChanged: " + textBoxStartupScript.Text);
+            this.buttonSaveConfig.Enabled = true;
+            this.buttonCancelConfig.Enabled = true;
+        }
+
+        private void buttonShutdownScript_Click(object sender, EventArgs e)
+        {
+            SelectFile(textBoxShutdownScript);
+        }
+
+        private void textBoxShutdownScript_TextChanged(object sender, EventArgs e)
+        {
+            this.buttonSaveConfig.Enabled = true;
+            this.buttonCancelConfig.Enabled = true;
+        }
+
+        private void SelectFile(TextBox textBox)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Title = "Select File";
+            openFileDialog1.InitialDirectory = @"C:\";//--"C:\\";
+            openFileDialog1.Filter = "All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.ShowDialog();
+            if (openFileDialog1.FileName != "")
+            { textBox.Text = openFileDialog1.FileName; }
+        }
     }
 }
