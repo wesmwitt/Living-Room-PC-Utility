@@ -49,10 +49,10 @@ namespace Living_Room_PC_Utility
             "wscript.exe", "dxgiadaptercache.exe", "WMIADAP.exe", "ngen.exe", "APSDaemon.exe", "taskkill.exe", "mscorsvw.exe", "MoNotificationUx.exe", "UIEOrchestrator.exe", "NZXT CAM.exe",
             "EasyAntiCheat_EOS.exe", "ShellExperienceHost.exe", "CrashReportClient.exe", "MpCmdRun.exe", "MpSigStub.exe", "LogiLuUpdater.exe", "UsoClient.exe", "TrustedInstaller.exe", "dmclient.exe",
             "MicrosoftEdgeUpdate.exe", "wermgr.exe", "EpicWebHelper.exe", "iCloudFirefox.exe", "chrome_proxy.exe", "NgcIso.exe", "provtool.exe", "Defrag.exe", "EpicGamesUpdater.exe", "DeviceCensus.exe",
-            "bootstrapper.exe", "dxdiag.exe", "codCrashHandler.exe", "WmiApSrv.exe", "elevation_service.exe", "inno_updater.exe", "remoting_native_messaging_host.exe", "EALaunchHelper.exe",
-            "EALocalHostSvc.exe", "IGOProxy32.exe", "EAAntiCheat.Installer.exe", "EAAntiCheat.GameService.dll", "EAAntiCheat.GameService.exe", "OpenWith.exe", "AM_Delta_Patch_1.427.205.0.exe",
-            "makecab.exe", "UpdaterSetup.exe", "qualification_app.exe", "PING.EXE", "ControllerCompanion.exe", "default-browser-agent.exe", "WaaSMedicAgent.exe", "gifsicle.exe", "dbInstaller.exe",
-            "appidcertstorecheck.exe", "TcNo-Acc-Switcher.exe", "TcNo-Acc-Switcher_main.exe", "opushutil.exe", "runas.exe", "WerFault.exe", "SpeechModelDownload.exe", "DiskSnapshot.exe", "dstokenclean.exe",
+            "bootstrapper.exe", "dxdiag.exe", "codCrashHandler.exe", "WmiApSrv.exe", "elevation_service.exe", "inno_updater.exe", "remoting_native_messaging_host.exe", "EALaunchHelper.exe", 
+            "EALocalHostSvc.exe", "IGOProxy32.exe", "EAAntiCheat.Installer.exe", "EAAntiCheat.GameService.dll", "EAAntiCheat.GameService.exe", "OpenWith.exe", "AM_Delta_Patch_1.427.205.0.exe", 
+            "makecab.exe", "UpdaterSetup.exe", "qualification_app.exe", "PING.EXE", "ControllerCompanion.exe", "default-browser-agent.exe", "WaaSMedicAgent.exe", "gifsicle.exe", "dbInstaller.exe", 
+            "appidcertstorecheck.exe", "TcNo-Acc-Switcher.exe", "TcNo-Acc-Switcher_main.exe", "opushutil.exe", "runas.exe", "WerFault.exe", "SpeechModelDownload.exe", "DiskSnapshot.exe", "dstokenclean.exe", 
             "cleanmgr.exe", "ngentask.exe", "reg.exe", "doff.exe", "identity_helper.exe", "code-tunnel.exe", "wsl.exe", "icacls.exe", "DesignToolsServer.exe"
         ];
 
