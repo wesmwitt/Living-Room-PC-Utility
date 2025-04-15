@@ -32,7 +32,7 @@
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
-            label4 = new Label();
+            labelCurrentAudioDevice = new Label();
             label5 = new Label();
             label7 = new Label();
             comboBoxDolbyAtmos = new ComboBox();
@@ -88,15 +88,15 @@
             label3.TabIndex = 13;
             label3.Text = "Audio Device:";
             // 
-            // label4
+            // labelCurrentAudioDevice
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(380, 20);
-            label4.Margin = new Padding(2, 0, 2, 0);
-            label4.Name = "label4";
-            label4.Size = new Size(88, 25);
-            label4.TabIndex = 14;
-            label4.Text = "Loading...";
+            labelCurrentAudioDevice.AutoSize = true;
+            labelCurrentAudioDevice.Location = new Point(380, 20);
+            labelCurrentAudioDevice.Margin = new Padding(2, 0, 2, 0);
+            labelCurrentAudioDevice.Name = "labelCurrentAudioDevice";
+            labelCurrentAudioDevice.Size = new Size(88, 25);
+            labelCurrentAudioDevice.TabIndex = 14;
+            labelCurrentAudioDevice.Text = "Loading...";
             // 
             // label5
             // 
@@ -350,7 +350,7 @@
             Controls.Add(comboBoxSurroundSound);
             Controls.Add(label6);
             Controls.Add(label5);
-            Controls.Add(label4);
+            Controls.Add(labelCurrentAudioDevice);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
@@ -371,7 +371,7 @@
         private Label label1;
         private Label label2;
         private Label label3;
-        private Label label4;
+        private Label labelCurrentAudioDevice;
         private Label label5;
         private Label label7;
         private ComboBox comboBoxDolbyAtmos;
