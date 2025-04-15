@@ -48,9 +48,14 @@
             programListToolStripMenuItem = new ToolStripMenuItem();
             testProgramToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
-            openFileDialog1 = new OpenFileDialog();
             labelDefaultVolume = new Label();
             numericUpDownDefaultVolume = new NumericUpDown();
+            labelStartupScript = new Label();
+            labelShutdownScript = new Label();
+            textBoxStartupScript = new TextBox();
+            textBoxShutdownScript = new TextBox();
+            buttonStartupScript = new Button();
+            buttonShutdownScript = new Button();
             menuStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDownDefaultVolume).BeginInit();
             SuspendLayout();
@@ -128,7 +133,7 @@
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(453, 224);
+            label9.Location = new Point(654, 154);
             label9.Margin = new Padding(2, 0, 2, 0);
             label9.Name = "label9";
             label9.Size = new Size(157, 25);
@@ -139,7 +144,7 @@
             // 
             comboBoxVolumeSwitching.FormattingEnabled = true;
             comboBoxVolumeSwitching.Items.AddRange(new object[] { "Disabled", "Enabled" });
-            comboBoxVolumeSwitching.Location = new Point(453, 252);
+            comboBoxVolumeSwitching.Location = new Point(654, 182);
             comboBoxVolumeSwitching.Margin = new Padding(2);
             comboBoxVolumeSwitching.Name = "comboBoxVolumeSwitching";
             comboBoxVolumeSwitching.Size = new Size(177, 33);
@@ -191,7 +196,7 @@
             // buttonSaveConfig
             // 
             buttonSaveConfig.Enabled = false;
-            buttonSaveConfig.Location = new Point(258, 394);
+            buttonSaveConfig.Location = new Point(423, 473);
             buttonSaveConfig.Name = "buttonSaveConfig";
             buttonSaveConfig.Size = new Size(112, 34);
             buttonSaveConfig.TabIndex = 29;
@@ -202,7 +207,7 @@
             // buttonCancelConfig
             // 
             buttonCancelConfig.Enabled = false;
-            buttonCancelConfig.Location = new Point(376, 394);
+            buttonCancelConfig.Location = new Point(541, 473);
             buttonCancelConfig.Name = "buttonCancelConfig";
             buttonCancelConfig.Size = new Size(112, 34);
             buttonCancelConfig.TabIndex = 30;
@@ -218,7 +223,7 @@
             menuStrip2.Items.AddRange(new ToolStripItem[] { programListToolStripMenuItem, testProgramToolStripMenuItem, toolStripMenuItem1 });
             menuStrip2.Location = new Point(0, 0);
             menuStrip2.Name = "menuStrip2";
-            menuStrip2.Size = new Size(240, 455);
+            menuStrip2.Size = new Size(240, 519);
             menuStrip2.TabIndex = 32;
             menuStrip2.Text = "menuStrip2";
             // 
@@ -253,25 +258,85 @@
             // labelDefaultVolume
             // 
             labelDefaultVolume.AutoSize = true;
-            labelDefaultVolume.Location = new Point(453, 295);
+            labelDefaultVolume.Location = new Point(654, 224);
             labelDefaultVolume.Name = "labelDefaultVolume";
-            labelDefaultVolume.Size = new Size(220, 25);
+            labelDefaultVolume.Size = new Size(148, 25);
             labelDefaultVolume.TabIndex = 33;
-            labelDefaultVolume.Text = "Default Volume (Desktop):";
+            labelDefaultVolume.Text = "Desktop Volume:";
             // 
             // numericUpDownDefaultVolume
             // 
-            numericUpDownDefaultVolume.Location = new Point(453, 323);
+            numericUpDownDefaultVolume.Location = new Point(654, 252);
             numericUpDownDefaultVolume.Name = "numericUpDownDefaultVolume";
             numericUpDownDefaultVolume.Size = new Size(180, 31);
             numericUpDownDefaultVolume.TabIndex = 35;
             numericUpDownDefaultVolume.ValueChanged += numericUpDownDefaultVolume_ValueChanged;
             // 
+            // labelStartupScript
+            // 
+            labelStartupScript.AutoSize = true;
+            labelStartupScript.Location = new Point(258, 310);
+            labelStartupScript.Name = "labelStartupScript";
+            labelStartupScript.Size = new Size(253, 25);
+            labelStartupScript.TabIndex = 36;
+            labelStartupScript.Text = "Global Program Startup Script:";
+            // 
+            // labelShutdownScript
+            // 
+            labelShutdownScript.AutoSize = true;
+            labelShutdownScript.Location = new Point(258, 385);
+            labelShutdownScript.Name = "labelShutdownScript";
+            labelShutdownScript.Size = new Size(277, 25);
+            labelShutdownScript.TabIndex = 37;
+            labelShutdownScript.Text = "Global Program Shutdown Script:";
+            // 
+            // textBoxStartupScript
+            // 
+            textBoxStartupScript.Location = new Point(258, 338);
+            textBoxStartupScript.Name = "textBoxStartupScript";
+            textBoxStartupScript.Size = new Size(458, 31);
+            textBoxStartupScript.TabIndex = 38;
+            textBoxStartupScript.TextChanged += textBoxStartupScript_TextChanged;
+            // 
+            // textBoxShutdownScript
+            // 
+            textBoxShutdownScript.Location = new Point(258, 413);
+            textBoxShutdownScript.Name = "textBoxShutdownScript";
+            textBoxShutdownScript.Size = new Size(458, 31);
+            textBoxShutdownScript.TabIndex = 39;
+            textBoxShutdownScript.TextChanged += textBoxShutdownScript_TextChanged;
+            // 
+            // buttonStartupScript
+            // 
+            buttonStartupScript.Location = new Point(722, 338);
+            buttonStartupScript.Name = "buttonStartupScript";
+            buttonStartupScript.Size = new Size(112, 34);
+            buttonStartupScript.TabIndex = 40;
+            buttonStartupScript.Text = "Choose File";
+            buttonStartupScript.UseVisualStyleBackColor = true;
+            buttonStartupScript.Click += buttonStartupScript_Click;
+            // 
+            // buttonShutdownScript
+            // 
+            buttonShutdownScript.Location = new Point(722, 411);
+            buttonShutdownScript.Name = "buttonShutdownScript";
+            buttonShutdownScript.Size = new Size(112, 34);
+            buttonShutdownScript.TabIndex = 41;
+            buttonShutdownScript.Text = "Choose File";
+            buttonShutdownScript.UseVisualStyleBackColor = true;
+            buttonShutdownScript.Click += buttonShutdownScript_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(668, 455);
+            ClientSize = new Size(849, 519);
+            Controls.Add(buttonShutdownScript);
+            Controls.Add(buttonStartupScript);
+            Controls.Add(textBoxShutdownScript);
+            Controls.Add(textBoxStartupScript);
+            Controls.Add(labelShutdownScript);
+            Controls.Add(labelStartupScript);
             Controls.Add(numericUpDownDefaultVolume);
             Controls.Add(labelDefaultVolume);
             Controls.Add(buttonCancelConfig);
@@ -322,9 +387,14 @@
         private ToolStripMenuItem programListToolStripMenuItem;
         private ToolStripMenuItem testProgramToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem1;
-        private OpenFileDialog openFileDialog1;
         private Button button1;
         private Label labelDefaultVolume;
         private NumericUpDown numericUpDownDefaultVolume;
+        private Label labelStartupScript;
+        private Label labelShutdownScript;
+        private TextBox textBoxStartupScript;
+        private TextBox textBoxShutdownScript;
+        private Button buttonStartupScript;
+        private Button buttonShutdownScript;
     }
 }
