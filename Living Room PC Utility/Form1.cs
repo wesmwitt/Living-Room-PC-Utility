@@ -241,6 +241,7 @@ namespace Living_Room_PC_Utility
 
                 if (trackedProcesses.Contains(processId))
                 {
+
                     trackedProcesses.Remove(processId);
                     Debug.WriteLine($"Process Closed: {processName} - {processId}");
                     TryUnsetActiveProgram(processId);
@@ -400,39 +401,24 @@ namespace Living_Room_PC_Utility
         {
             if (this.activeProgramPID == pid)
             {
+
+                //run program shutdown script if it has it
+                var prog = GetProgramFromConfig(this.programConfigs, this.activeProgramStr).Value;
+                if (prog.ShutdownScript != "")
+                {
+                    RunScript(prog.ShutdownScript);
+                }
+
                 ShowProgramStatusBaloon(false, this.activeProgramStr);
                 this.activeProgramPID = 0;
                 this.activeProgramStr = "";
-                RunShutdownScript();
+                RunGlobalShutdownScript();
 
                 this.SetDefaultSoundDisplaySettings();
                 label2.Invoke((Action)delegate
                 {
                     label2.Text = "";
                 });
-            }
-        }
-
-        private void RunShutdownScript()
-        {
-            if (this.globalConfig.ShutdownScript != "")
-            {
-                // Run startup script with the default associated application
-                Debug.WriteLine("Has startup script.");
-                ProcessStartInfo startInfo = new ProcessStartInfo();
-                startInfo.FileName = this.globalConfig.ShutdownScript;
-                startInfo.UseShellExecute = true; // Use the default application
-
-                try
-                {
-                    Process.Start(startInfo);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Failed to start process: {ex.Message}");
-                    // Optionally, you can show a message box or log the error
-                    MessageBox.Show($"Failed to start process: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
         }
 
@@ -480,7 +466,13 @@ namespace Living_Room_PC_Utility
 
             }
 
-            RunStartupScript();
+            //Run the program specific startup script if it has it
+            if(prog.StartupScript != "")
+            {
+                RunScript(prog.StartupScript);
+            }
+
+            RunGlobalStartupScript();
 
         }
 
@@ -496,29 +488,6 @@ namespace Living_Room_PC_Utility
             else
             {
                 this.labelCurrentAudioDevice.Text = AudioSetter.GetAudioDevice();
-            }
-        }
-
-        private void RunStartupScript()
-        {
-            if (this.globalConfig.StartupScript != "")
-            {
-                // Run startup script with the default associated application
-                Debug.WriteLine("Has startup script.");
-                ProcessStartInfo startInfo = new ProcessStartInfo();
-                startInfo.FileName = this.globalConfig.StartupScript;
-                startInfo.UseShellExecute = true; // Use the default application
-
-                try
-                {
-                    Process.Start(startInfo);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Failed to start process: {ex.Message}");
-                    // Optionally, you can show a message box or log the error
-                    MessageBox.Show($"Failed to start process: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
         }
 
@@ -836,5 +805,53 @@ namespace Living_Room_PC_Utility
             if (openFileDialog1.FileName != "")
             { textBox.Text = openFileDialog1.FileName; }
         }
+
+        private void RunScript(string script)
+        {
+           if(string.IsNullOrEmpty(script))
+            {
+                Debug.WriteLine("Script path is empty or null.");
+                return;
+            }
+            // Run the script with the default associated application
+            Debug.WriteLine("Running script: " + script);
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = script;
+            startInfo.UseShellExecute = true; // Use the default application
+
+            try
+            {
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to start process: {ex.Message}");
+                // Optionally, you can show a message box or log the error
+                MessageBox.Show($"Failed to start process: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
+        }
+
+        private void RunGlobalStartupScript()
+        {
+            if (this.globalConfig.StartupScript != "")
+            {
+                // Run global startup script with the default associated application
+                Debug.WriteLine("Has global startup script.");
+                RunScript(this.globalConfig.StartupScript);
+            }
+        }
+
+        private void RunGlobalShutdownScript()
+        {
+            if (this.globalConfig.ShutdownScript != "")
+            {
+                // Run global shutdown script with the default associated application
+                Debug.WriteLine("Has global shutdown script.");
+                RunScript(this.globalConfig.ShutdownScript);
+            }
+        }
+
+
     }
 }

@@ -50,9 +50,9 @@ namespace Living_Room_PC_Utility
             }else if (attributeName == "VolumeSetting"){
                 VolumeSetting = value;
             }else if (attributeName == "StartupScript"){
-                StartupScript = value; //keep this as a string
+                StartupScript = value;
             }else if (attributeName == "ShutdownScript"){
-                ShutdownScript = value; //keep this as a string
+                ShutdownScript = value;
             }
         }
 
@@ -106,14 +106,34 @@ namespace Living_Room_PC_Utility
             return getFriendlyNameForSetting("VolumeSetting", VolumeSetting);
         }
 
+        public string getStartupScriptFriendlyName()
+        {
+            return getFriendlyNameForSetting("StartupScript", StartupScript);
+        }
+
+        public string getShutdownScriptFriendlyName()
+        {
+            return getFriendlyNameForSetting("ShutdownScript", ShutdownScript);
+        }
+
         public string toString()
         {
-            return "SurroundSoundSetting: " + SurroundSoundSetting + ", HDRSetting: " + HDRSetting + ", DelaySetting: " + DelaySetting + ", VolumeSetting: " + VolumeSetting;
+            return "SurroundSoundSetting: " + SurroundSoundSetting
+                + ", HDRSetting: " + HDRSetting
+                + ", DelaySetting: " + DelaySetting
+                + ", VolumeSetting: " + VolumeSetting
+                + ", StartupScript: " + StartupScript
+                + ", ShutdownScript: " + ShutdownScript;
         }
 
         public string toFriendlyString()
         {
-            return "Surround Sound: " + getSurroundSoundFriendlyName() + ", HDR: " + getHDRFriendlyName() + ", Delay: " + getDelayFriendlyName() + ", Volume: " + getVolumeFriendlyName();
+            return "Surround Sound: " + getSurroundSoundFriendlyName() 
+                + ", HDR: " + getHDRFriendlyName() 
+                + ", Delay: " + getDelayFriendlyName() 
+                + ", Volume: " + getVolumeFriendlyName()
+                + ", Startup Script: " + getStartupScriptFriendlyName()
+                + ", Shutdown Script: " + getShutdownScriptFriendlyName();
         }
 
         public string toFriendlyStringConcise()
@@ -132,9 +152,17 @@ namespace Living_Room_PC_Utility
             {
                 str += "Delay: " + getDelayFriendlyName() + ", ";
             }
-            if (VolumeSetting != "")
+            if (VolumeSetting != "" && VolumeSetting != "0")
             {
                 str += "Volume: " + getVolumeFriendlyName() + ", ";
+            }
+            if (StartupScript != "")
+            {
+                str += "Startup Script: Enabled, ";
+            }
+            if (ShutdownScript != "")
+            {
+                str += "Shutdown Script: Enabled, ";
             }
 
             return str.Substring(0,str.Length-2); //remove ", " from the end
@@ -154,7 +182,7 @@ namespace Living_Room_PC_Utility
 
         public static string getFriendlyNameForSetting(string setting, string value)
         {
-            if(value == "")
+            if(value == "") //curently this stops any blank value from being displayed, is this the intention? 
             {
                 return "";
             }
@@ -169,9 +197,20 @@ namespace Living_Room_PC_Utility
                 if (value == "0"){return "Disabled";}
                 else if (value == "1"){return "Enabled";}
             }
-            if(setting == "VolumeSetting")
+            if (setting == "VolumeSetting")
             {
-                return "" + value;
+                if (value == "0" || value == "") { return "Unset"; }
+                else { return value; }
+            }
+            if (setting == "StartupScript")
+            {
+                if (value == "") { return "Unset"; }
+                else { return value; }
+            }
+            if (setting == "ShutdownScript")
+            {
+                if (value == "") { return "Unset"; }
+                else { return value; }
             }
             return "Error";
         }   
