@@ -42,6 +42,7 @@
             comboBoxHdr = new ComboBox();
             labelTestHdr = new Label();
             comboBoxTestHdr = new ComboBox();
+            label1 = new Label();
             SuspendLayout();
             // 
             // buttonStartTest
@@ -99,7 +100,7 @@
             // labelSoundMode
             // 
             labelSoundMode.AutoSize = true;
-            labelSoundMode.Location = new Point(518, 127);
+            labelSoundMode.Location = new Point(518, 157);
             labelSoundMode.Margin = new Padding(2, 0, 2, 0);
             labelSoundMode.Name = "labelSoundMode";
             labelSoundMode.Size = new Size(147, 25);
@@ -121,10 +122,10 @@
             comboBoxSoundMode.Enabled = false;
             comboBoxSoundMode.FormattingEnabled = true;
             comboBoxSoundMode.Items.AddRange(new object[] { "Stereo (Disabled)", "5.1 Surround", "7.1 Surround" });
-            comboBoxSoundMode.Location = new Point(518, 154);
+            comboBoxSoundMode.Location = new Point(518, 184);
             comboBoxSoundMode.Margin = new Padding(2);
             comboBoxSoundMode.Name = "comboBoxSoundMode";
-            comboBoxSoundMode.Size = new Size(177, 33);
+            comboBoxSoundMode.Size = new Size(347, 33);
             comboBoxSoundMode.TabIndex = 30;
             // 
             // buttonSave
@@ -154,7 +155,7 @@
             // labelHdr
             // 
             labelHdr.AutoSize = true;
-            labelHdr.Location = new Point(518, 228);
+            labelHdr.Location = new Point(518, 288);
             labelHdr.Margin = new Padding(2, 0, 2, 0);
             labelHdr.Name = "labelHdr";
             labelHdr.Size = new Size(53, 25);
@@ -166,10 +167,10 @@
             comboBoxHdr.Enabled = false;
             comboBoxHdr.FormattingEnabled = true;
             comboBoxHdr.Items.AddRange(new object[] { "Disabled", "Enabled" });
-            comboBoxHdr.Location = new Point(518, 255);
+            comboBoxHdr.Location = new Point(518, 315);
             comboBoxHdr.Margin = new Padding(2);
             comboBoxHdr.Name = "comboBoxHdr";
-            comboBoxHdr.Size = new Size(177, 33);
+            comboBoxHdr.Size = new Size(347, 33);
             comboBoxHdr.TabIndex = 36;
             comboBoxHdr.SelectedIndexChanged += comboBoxHdr_SelectedIndexChanged;
             // 
@@ -194,11 +195,23 @@
             comboBoxTestHdr.TabIndex = 38;
             comboBoxTestHdr.SelectedIndexChanged += comboBoxTestHdr_SelectedIndexChanged;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
+            label1.ForeColor = SystemColors.ControlDarkDark;
+            label1.Location = new Point(518, 219);
+            label1.Name = "label1";
+            label1.Size = new Size(357, 25);
+            label1.TabIndex = 39;
+            label1.Text = "If Atmos Displays on Reciever/TV, Select: 7.1";
+            // 
             // FormTest
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1068, 450);
+            Controls.Add(label1);
             Controls.Add(comboBoxTestHdr);
             Controls.Add(labelTestHdr);
             Controls.Add(comboBoxHdr);
@@ -236,5 +249,6 @@
         private ComboBox comboBoxHdr;
         private Label labelTestHdr;
         private ComboBox comboBoxTestHdr;
+        private Label label1;
     }
 }
