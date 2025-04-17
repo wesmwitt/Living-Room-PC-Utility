@@ -39,7 +39,10 @@ namespace Living_Room_PC_Utility
                     item.Value.getSurroundSoundFriendlyName(),
                     item.Value.getHDRFriendlyName(),
                     item.Value.getVolumeFriendlyName(),
-                    item.Value.getDelayFriendlyName()
+                    item.Value.getDelayFriendlyName(),
+                    (item.Value.StartupScript != "") ? "Enabled" : "",
+                    (item.Value.ShutdownScript != "") ? "Enabled" : "",
+                    this.programConfigsUser.ContainsKey(item.Key) ? "Yes" : ""
                     );
             }
             dataGridView1.Refresh();
@@ -86,6 +89,9 @@ namespace Living_Room_PC_Utility
                     numericUpDownVolume.Value = defaultVolume;
 
                     comboBoxDelay.Text = selectedConfigUser.getDelayFriendlyName();
+
+                    textBoxStartupScript.Text = selectedConfigUser.StartupScript;
+                    textBoxShutdownScript.Text = selectedConfigUser.ShutdownScript;
                 }
                 else
                 {
@@ -93,6 +99,8 @@ namespace Living_Room_PC_Utility
                     comboBoxHdr.Text = "";
                     numericUpDownVolume.Value = 0;
                     comboBoxDelay.Text = "";
+                    textBoxStartupScript.Text = "";
+                    textBoxShutdownScript.Text = "";
                 }
 
                 if (programConfigsGlobal.ContainsKey(selectedProgram))
@@ -101,7 +109,7 @@ namespace Living_Room_PC_Utility
                     comboBoxSoundModeGlobal.Text = selectedConfigGlobal.getSurroundSoundFriendlyName();
                     comboBoxHdrGlobal.Text = selectedConfigGlobal.getHDRFriendlyName();
                     comboBoxDelayGlobal.Text = selectedConfigGlobal.getDelayFriendlyName();
-                    //global does not have a volume setting
+                    //global does not have a volume setting or startup/shutdown
                 }
                 else
                 {
@@ -129,6 +137,16 @@ namespace Living_Room_PC_Utility
         }
 
         private void numericUpDownDefaultVolume_ValueChanged(object sender, EventArgs e)
+        {
+            this.SetSaveCancelButtons(true);
+        }
+
+        private void textBoxStartupScript_TextChanged(object sender, EventArgs e)
+        {
+            this.SetSaveCancelButtons(true);
+        }
+
+        private void textBoxShutdownScript_TextChanged(object sender, EventArgs e)
         {
             this.SetSaveCancelButtons(true);
         }
@@ -183,9 +201,21 @@ namespace Living_Room_PC_Utility
                 }
 
                 var volumeSetting = numericUpDownVolume.Value;
-                if(volumeSetting != 0)
+                if (volumeSetting != 0)
                 {
                     tempProgConfig.VolumeSetting = volumeSetting.ToString();
+                }
+
+                var startupScript = textBoxStartupScript.Text;
+                if (startupScript != "")
+                {
+                    tempProgConfig.StartupScript = startupScript;
+                }
+
+                var shutdownScript = textBoxShutdownScript.Text;
+                if (shutdownScript != "")
+                {
+                    tempProgConfig.ShutdownScript = shutdownScript;
                 }
 
                 ProgramConfig.UpdateProgramConfigListUser(selectedProgram, tempProgConfig);
@@ -207,6 +237,28 @@ namespace Living_Room_PC_Utility
         private void labelVolume_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void buttonStartupScript_Click(object sender, EventArgs e)
+        {
+            SelectFile(textBoxStartupScript);
+        }
+
+        private void buttonShutdownScript_Click(object sender, EventArgs e)
+        {
+            SelectFile(textBoxShutdownScript);
+        }
+
+        private void SelectFile(TextBox textBox)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Title = "Select File";
+            openFileDialog1.InitialDirectory = @"C:\";//--"C:\\";
+            openFileDialog1.Filter = "All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.ShowDialog();
+            if (openFileDialog1.FileName != "")
+            { textBox.Text = openFileDialog1.FileName; }
         }
 
     }

@@ -34,6 +34,9 @@
             HDR = new DataGridViewTextBoxColumn();
             Volume = new DataGridViewTextBoxColumn();
             Delay = new DataGridViewTextBoxColumn();
+            startupScriptEnabled = new DataGridViewTextBoxColumn();
+            shutdownScriptEnabled = new DataGridViewTextBoxColumn();
+            userConfigured = new DataGridViewTextBoxColumn();
             comboBoxHdr = new ComboBox();
             labelHdr = new Label();
             buttonCancel = new Button();
@@ -52,6 +55,13 @@
             label3 = new Label();
             labelVolume = new Label();
             numericUpDownVolume = new NumericUpDown();
+            buttonShutdownScript = new Button();
+            buttonStartupScript = new Button();
+            textBoxShutdownScript = new TextBox();
+            textBoxStartupScript = new TextBox();
+            labelShutdownScript = new Label();
+            labelStartupScript = new Label();
+            panel1 = new Panel();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownVolume).BeginInit();
             SuspendLayout();
@@ -62,14 +72,14 @@
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { ProgName, Sound, HDR, Volume, Delay });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { ProgName, Sound, HDR, Volume, Delay, startupScriptEnabled, shutdownScriptEnabled, userConfigured });
             dataGridView1.Location = new Point(11, 11);
             dataGridView1.Margin = new Padding(2);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersWidth = 72;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(981, 320);
+            dataGridView1.Size = new Size(1386, 320);
             dataGridView1.TabIndex = 18;
             dataGridView1.SelectionChanged += DataGridView1_SelectionChanged;
             // 
@@ -117,12 +127,36 @@
             Delay.ReadOnly = true;
             Delay.Width = 92;
             // 
+            // startupScriptEnabled
+            // 
+            startupScriptEnabled.HeaderText = "Startup Script";
+            startupScriptEnabled.MinimumWidth = 8;
+            startupScriptEnabled.Name = "startupScriptEnabled";
+            startupScriptEnabled.ReadOnly = true;
+            startupScriptEnabled.Width = 150;
+            // 
+            // shutdownScriptEnabled
+            // 
+            shutdownScriptEnabled.HeaderText = "Shutdown Script";
+            shutdownScriptEnabled.MinimumWidth = 8;
+            shutdownScriptEnabled.Name = "shutdownScriptEnabled";
+            shutdownScriptEnabled.ReadOnly = true;
+            shutdownScriptEnabled.Width = 150;
+            // 
+            // userConfigured
+            // 
+            userConfigured.HeaderText = "Has User Config";
+            userConfigured.MinimumWidth = 8;
+            userConfigured.Name = "userConfigured";
+            userConfigured.ReadOnly = true;
+            userConfigured.Width = 120;
+            // 
             // comboBoxHdr
             // 
             comboBoxHdr.Enabled = false;
             comboBoxHdr.FormattingEnabled = true;
             comboBoxHdr.Items.AddRange(new object[] { "Unset", "Disabled", "Enabled" });
-            comboBoxHdr.Location = new Point(246, 473);
+            comboBoxHdr.Location = new Point(650, 484);
             comboBoxHdr.Margin = new Padding(2);
             comboBoxHdr.Name = "comboBoxHdr";
             comboBoxHdr.Size = new Size(177, 33);
@@ -132,7 +166,7 @@
             // labelHdr
             // 
             labelHdr.AutoSize = true;
-            labelHdr.Location = new Point(246, 446);
+            labelHdr.Location = new Point(650, 457);
             labelHdr.Margin = new Padding(2, 0, 2, 0);
             labelHdr.Name = "labelHdr";
             labelHdr.Size = new Size(53, 25);
@@ -142,7 +176,7 @@
             // buttonCancel
             // 
             buttonCancel.Enabled = false;
-            buttonCancel.Location = new Point(358, 592);
+            buttonCancel.Location = new Point(759, 746);
             buttonCancel.Margin = new Padding(2);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(109, 33);
@@ -154,7 +188,7 @@
             // buttonSave
             // 
             buttonSave.Enabled = false;
-            buttonSave.Location = new Point(244, 592);
+            buttonSave.Location = new Point(646, 746);
             buttonSave.Margin = new Padding(2);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(109, 33);
@@ -168,7 +202,7 @@
             comboBoxSoundMode.Enabled = false;
             comboBoxSoundMode.FormattingEnabled = true;
             comboBoxSoundMode.Items.AddRange(new object[] { "Unset", "Stereo (Disabled)", "5.1 Surround", "7.1 Surround" });
-            comboBoxSoundMode.Location = new Point(246, 411);
+            comboBoxSoundMode.Location = new Point(650, 422);
             comboBoxSoundMode.Margin = new Padding(2);
             comboBoxSoundMode.Name = "comboBoxSoundMode";
             comboBoxSoundMode.Size = new Size(177, 33);
@@ -178,7 +212,7 @@
             // labelSoundMode
             // 
             labelSoundMode.AutoSize = true;
-            labelSoundMode.Location = new Point(246, 384);
+            labelSoundMode.Location = new Point(650, 395);
             labelSoundMode.Margin = new Padding(2, 0, 2, 0);
             labelSoundMode.Name = "labelSoundMode";
             labelSoundMode.Size = new Size(147, 25);
@@ -188,7 +222,7 @@
             // labelDelay
             // 
             labelDelay.AutoSize = true;
-            labelDelay.Location = new Point(246, 508);
+            labelDelay.Location = new Point(650, 519);
             labelDelay.Name = "labelDelay";
             labelDelay.Size = new Size(60, 25);
             labelDelay.TabIndex = 43;
@@ -199,7 +233,7 @@
             comboBoxDelay.Enabled = false;
             comboBoxDelay.FormattingEnabled = true;
             comboBoxDelay.Items.AddRange(new object[] { "Unset", "Disabled", "Enabled" });
-            comboBoxDelay.Location = new Point(246, 536);
+            comboBoxDelay.Location = new Point(650, 547);
             comboBoxDelay.Name = "comboBoxDelay";
             comboBoxDelay.Size = new Size(177, 33);
             comboBoxDelay.TabIndex = 44;
@@ -209,7 +243,7 @@
             // 
             labelGlobalSettings.AutoSize = true;
             labelGlobalSettings.Font = new Font("Segoe UI", 14F);
-            labelGlobalSettings.Location = new Point(12, 333);
+            labelGlobalSettings.Location = new Point(162, 344);
             labelGlobalSettings.Name = "labelGlobalSettings";
             labelGlobalSettings.Size = new Size(209, 38);
             labelGlobalSettings.TabIndex = 45;
@@ -219,7 +253,7 @@
             // 
             labelUserSettings.AutoSize = true;
             labelUserSettings.Font = new Font("Segoe UI", 14F);
-            labelUserSettings.Location = new Point(242, 333);
+            labelUserSettings.Location = new Point(813, 344);
             labelUserSettings.Name = "labelUserSettings";
             labelUserSettings.Size = new Size(186, 38);
             labelUserSettings.TabIndex = 46;
@@ -230,7 +264,7 @@
             comboBoxDelayGlobal.Enabled = false;
             comboBoxDelayGlobal.FormattingEnabled = true;
             comboBoxDelayGlobal.Items.AddRange(new object[] { "Disabled", "Enabled" });
-            comboBoxDelayGlobal.Location = new Point(12, 536);
+            comboBoxDelayGlobal.Location = new Point(162, 547);
             comboBoxDelayGlobal.Name = "comboBoxDelayGlobal";
             comboBoxDelayGlobal.Size = new Size(177, 33);
             comboBoxDelayGlobal.TabIndex = 52;
@@ -238,7 +272,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 508);
+            label1.Location = new Point(162, 519);
             label1.Name = "label1";
             label1.Size = new Size(60, 25);
             label1.TabIndex = 51;
@@ -249,7 +283,7 @@
             comboBoxHdrGlobal.Enabled = false;
             comboBoxHdrGlobal.FormattingEnabled = true;
             comboBoxHdrGlobal.Items.AddRange(new object[] { "Disabled", "Enabled" });
-            comboBoxHdrGlobal.Location = new Point(12, 473);
+            comboBoxHdrGlobal.Location = new Point(162, 484);
             comboBoxHdrGlobal.Margin = new Padding(2);
             comboBoxHdrGlobal.Name = "comboBoxHdrGlobal";
             comboBoxHdrGlobal.Size = new Size(177, 33);
@@ -258,7 +292,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 446);
+            label2.Location = new Point(162, 457);
             label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
             label2.Size = new Size(53, 25);
@@ -270,7 +304,7 @@
             comboBoxSoundModeGlobal.Enabled = false;
             comboBoxSoundModeGlobal.FormattingEnabled = true;
             comboBoxSoundModeGlobal.Items.AddRange(new object[] { "Stereo (Disabled)", "5.1 Surround", "7.1 Surround" });
-            comboBoxSoundModeGlobal.Location = new Point(12, 411);
+            comboBoxSoundModeGlobal.Location = new Point(162, 422);
             comboBoxSoundModeGlobal.Margin = new Padding(2);
             comboBoxSoundModeGlobal.Name = "comboBoxSoundModeGlobal";
             comboBoxSoundModeGlobal.Size = new Size(177, 33);
@@ -279,7 +313,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(12, 384);
+            label3.Location = new Point(162, 395);
             label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
             label3.Size = new Size(147, 25);
@@ -289,7 +323,7 @@
             // labelVolume
             // 
             labelVolume.AutoSize = true;
-            labelVolume.Location = new Point(473, 385);
+            labelVolume.Location = new Point(877, 396);
             labelVolume.Name = "labelVolume";
             labelVolume.Size = new Size(168, 25);
             labelVolume.TabIndex = 56;
@@ -297,17 +331,86 @@
             // 
             // numericUpDownVolume
             // 
-            numericUpDownVolume.Location = new Point(473, 413);
+            numericUpDownVolume.Location = new Point(877, 424);
             numericUpDownVolume.Name = "numericUpDownVolume";
             numericUpDownVolume.Size = new Size(180, 31);
             numericUpDownVolume.TabIndex = 57;
             numericUpDownVolume.ValueChanged += numericUpDownDefaultVolume_ValueChanged;
             // 
+            // buttonShutdownScript
+            // 
+            buttonShutdownScript.Location = new Point(1110, 699);
+            buttonShutdownScript.Name = "buttonShutdownScript";
+            buttonShutdownScript.Size = new Size(112, 34);
+            buttonShutdownScript.TabIndex = 63;
+            buttonShutdownScript.Text = "Choose File";
+            buttonShutdownScript.UseVisualStyleBackColor = true;
+            buttonShutdownScript.Click += buttonShutdownScript_Click;
+            // 
+            // buttonStartupScript
+            // 
+            buttonStartupScript.Location = new Point(1110, 626);
+            buttonStartupScript.Name = "buttonStartupScript";
+            buttonStartupScript.Size = new Size(112, 34);
+            buttonStartupScript.TabIndex = 62;
+            buttonStartupScript.Text = "Choose File";
+            buttonStartupScript.UseVisualStyleBackColor = true;
+            buttonStartupScript.Click += buttonStartupScript_Click;
+            // 
+            // textBoxShutdownScript
+            // 
+            textBoxShutdownScript.Location = new Point(646, 701);
+            textBoxShutdownScript.Name = "textBoxShutdownScript";
+            textBoxShutdownScript.Size = new Size(458, 31);
+            textBoxShutdownScript.TabIndex = 61;
+            textBoxShutdownScript.TextChanged += textBoxShutdownScript_TextChanged;
+            // 
+            // textBoxStartupScript
+            // 
+            textBoxStartupScript.Location = new Point(646, 626);
+            textBoxStartupScript.Name = "textBoxStartupScript";
+            textBoxStartupScript.Size = new Size(458, 31);
+            textBoxStartupScript.TabIndex = 60;
+            textBoxStartupScript.TextChanged += textBoxStartupScript_TextChanged;
+            // 
+            // labelShutdownScript
+            // 
+            labelShutdownScript.AutoSize = true;
+            labelShutdownScript.Location = new Point(646, 673);
+            labelShutdownScript.Name = "labelShutdownScript";
+            labelShutdownScript.Size = new Size(286, 25);
+            labelShutdownScript.TabIndex = 59;
+            labelShutdownScript.Text = "Program Specific Shutdown Script:";
+            // 
+            // labelStartupScript
+            // 
+            labelStartupScript.AutoSize = true;
+            labelStartupScript.Location = new Point(646, 598);
+            labelStartupScript.Name = "labelStartupScript";
+            labelStartupScript.Size = new Size(262, 25);
+            labelStartupScript.TabIndex = 58;
+            labelStartupScript.Text = "Program Specific Startup Script:";
+            // 
+            // panel1
+            // 
+            panel1.BackColor = SystemColors.ControlDark;
+            panel1.Location = new Point(487, 358);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(4, 408);
+            panel1.TabIndex = 64;
+            // 
             // Form3
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1003, 657);
+            ClientSize = new Size(1408, 788);
+            Controls.Add(panel1);
+            Controls.Add(buttonShutdownScript);
+            Controls.Add(buttonStartupScript);
+            Controls.Add(textBoxShutdownScript);
+            Controls.Add(textBoxStartupScript);
+            Controls.Add(labelShutdownScript);
+            Controls.Add(labelStartupScript);
             Controls.Add(numericUpDownVolume);
             Controls.Add(labelVolume);
             Controls.Add(comboBoxDelayGlobal);
@@ -340,10 +443,6 @@
         #endregion
 
         private DataGridView dataGridView1;
-        private DataGridViewTextBoxColumn ProgName;
-        private DataGridViewTextBoxColumn Sound;
-        private DataGridViewTextBoxColumn HDR;
-        private DataGridViewTextBoxColumn Delay;
         private ComboBox comboBoxHdr;
         private Label labelHdr;
         private Button buttonCancel;
@@ -360,9 +459,23 @@
         private Label label2;
         private ComboBox comboBoxSoundModeGlobal;
         private Label label3;
-        private DataGridViewTextBoxColumn Volume;
         private Label labelVolume;
         private TextBox textBox1;
         private NumericUpDown numericUpDownVolume;
+        private Button buttonShutdownScript;
+        private Button buttonStartupScript;
+        private TextBox textBoxShutdownScript;
+        private TextBox textBoxStartupScript;
+        private Label labelShutdownScript;
+        private Label labelStartupScript;
+        private DataGridViewTextBoxColumn ProgName;
+        private DataGridViewTextBoxColumn Sound;
+        private DataGridViewTextBoxColumn HDR;
+        private DataGridViewTextBoxColumn Volume;
+        private DataGridViewTextBoxColumn Delay;
+        private DataGridViewTextBoxColumn startupScriptEnabled;
+        private DataGridViewTextBoxColumn shutdownScriptEnabled;
+        private DataGridViewTextBoxColumn userConfigured;
+        private Panel panel1;
     }
 }
