@@ -56,6 +56,8 @@ namespace Living_Room_PC_Utility
             "cleanmgr.exe", "ngentask.exe", "reg.exe", "doff.exe", "identity_helper.exe", "code-tunnel.exe", "wsl.exe", "icacls.exe", "DesignToolsServer.exe"
         ];
 
+        bool showInitialPopUp = true; //only show the "No conigured process open" pop-up on startup
+
         public Form1()
         {
             InitializeComponent();
@@ -165,6 +167,7 @@ namespace Living_Room_PC_Utility
         }
         private void PopulateConfigFields()
         {
+
             comboBoxSurroundSound.SelectedIndex = this.globalConfig.SurroundSoundSetting;
             comboBoxHdr.SelectedIndex = this.globalConfig.HDRSetting;
             comboBoxDolbyAtmos.SelectedIndex = this.globalConfig.AtmosSetting;
@@ -276,13 +279,18 @@ namespace Living_Room_PC_Utility
 
         public void TrySetActiveProgramOnDemand()
         {
-
             bool hasActiveProgram = false;
 
             Process[] activeProcesses = Process.GetProcesses();
 
             foreach (Process activeProcess in activeProcesses)
             {
+
+                if (this.activeProgramPID != 0 && this.activeProgramPID == activeProcess.Id)
+                {
+                    Debug.WriteLine("Program already active, skipping");
+                    return;
+                }
 
                 ProgramConfig tempProgConfigByExe;
                 bool hasConfigByExe = (this.programConfigs.TryGetValue(activeProcess.ProcessName + ".exe", out tempProgConfigByExe));
@@ -300,6 +308,7 @@ namespace Living_Room_PC_Utility
 
                 if (hasConfigByExe || hasConfigByTitle)
                 {
+
 
                     hasActiveProgram = true;
 
@@ -333,16 +342,22 @@ namespace Living_Room_PC_Utility
                 {
                     label2.Text = "";
                 });
-                this.ShowProgramStatusBaloon(false);
+                if (this.showInitialPopUp) {
+                    this.ShowProgramStatusBaloon(false);
+                    this.showInitialPopUp = false;
+                }
+                
             }
+
+            Debug.WriteLine("TrySetActiveProgramOnDemand() hashasActiveProgram: " + hasActiveProgram);
 
         }
 
         public void TrySetActiveProgram(string programName, string programTitle, int programPID, Dictionary<string, ProgramConfig> config)
         {
 
-            //only set if there's not an active program still running
-            if (this.activeProgramPID != 0)
+            //only set if its the not the current active program
+            if (this.activeProgramPID == programPID)
             {
                 Debug.WriteLine("There is already a program active, skipping for now");
                 return;
@@ -399,6 +414,8 @@ namespace Living_Room_PC_Utility
 
         public void TryUnsetActiveProgram(int pid)
         {
+
+            Debug.WriteLine("TryUnsetActiveProgram() pid: ", pid);
             if (this.activeProgramPID == pid)
             {
 
@@ -414,7 +431,8 @@ namespace Living_Room_PC_Utility
                 this.activeProgramStr = "";
                 RunGlobalShutdownScript();
 
-                this.SetDefaultSoundDisplaySettings();
+                this.TrySetActiveProgramOnDemand();
+
                 label2.Invoke((Action)delegate
                 {
                     label2.Text = "";
